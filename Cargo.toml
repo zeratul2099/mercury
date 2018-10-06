@@ -1,0 +1,15 @@
+[package]
+name = "mercury"
+version = "0.1.0"
+authors = ["Marko <zeratul@posteo.de>"]
+
+[dependencies]
+chrono = "*"
+yaml-rust = "0.4"
+diesel = { version = "1.0.0", features = ["mysql", "chrono"] }
+rocket = "0.3.17"
+rocket_contrib = "0.3.17"
+rocket_codegen = "0.3.17"
+itertools = "*"
+lazy_static = "1.1.0"
+reqwest = "*"
