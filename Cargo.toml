@@ -1,7 +1,10 @@
+cargo-features = ["default-run"]
+
 [package]
 name = "mercury"
 version = "0.1.0"
 authors = ["Marko <zeratul@posteo.de>"]
+default-run = "mercury"
 
 [dependencies]
 chrono = "*"
@@ -13,3 +16,6 @@ rocket_codegen = "0.3.17"
 itertools = "*"
 lazy_static = "1.1.0"
 reqwest = "*"
+serde = "1.0.*"
+serde_json = "1.0.*"
+serde_derive = "1.0.*"
