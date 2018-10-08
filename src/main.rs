@@ -15,6 +15,7 @@ pub mod common;
 pub mod schema;
 pub mod models;
 
+use std::collections::{HashMap};
 use self::models::*;
 use rocket_contrib::Json;
 use common::{get_settings,check_notification,establish_connection};
@@ -29,16 +30,7 @@ struct SendQuery {
 }
 
 fn main() {
-    let settings = get_settings();
-    let connection = establish_connection(&settings);
-    let history = get_history(&connection, &settings);
-    for (s_id, values) in history {
-        println!("{}", s_id);
-        for (ts, t, h) in values {
-            println!("{}: {}, {}", ts, t, h);
-        }
-    }
-    //rocket::ignite().mount("/", routes![send,latest]).launch();
+    rocket::ignite().mount("/", routes![send,latest,history]).launch();
 }
 
 #[get("/api/send?<query>")]
@@ -59,3 +51,10 @@ fn latest() -> Json<Vec<(String, String, String, f32, f32)>> {
     Json(values)
 }
 
+#[get("/api/history")]
+fn history() -> Json<HashMap<i32, Vec<(String, f32, f32)>>> {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_history(&connection, &settings);
+    Json(values)
+}
