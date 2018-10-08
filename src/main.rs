@@ -33,12 +33,11 @@ fn main() {
 
 #[get("/api/send?<query>")]
 fn send(query: SendQuery) -> &'static str {
-    // TODO: check constraints
     let settings = get_settings();
     let connection = establish_connection(&settings);
     insert_values(&connection, &settings, &query.id, &query.t, &query.h);
-    check_notification(&settings, query.id as i64, &"t".to_string(), query.t as f64, &"2018-01-01".to_string());
-    check_notification(&settings, query.id as i64, &"h".to_string(), query.h as f64, &"2018-01-01".to_string());
+    check_notification(&settings, query.id as i64, &"t".to_string(), query.t as f64);
+    check_notification(&settings, query.id as i64, &"h".to_string(), query.h as f64);
     "OK"
 }
 

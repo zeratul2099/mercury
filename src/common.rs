@@ -80,7 +80,8 @@ fn send_pushover_message(settings: &Settings, message: String) {
 		.send();
 }
 
-pub fn check_notification(settings: &Settings, sensor: i64, vtype: &String, value: f64, ts: &String) {
+pub fn check_notification(settings: &Settings, sensor: i64, vtype: &String, value: f64) {
+    let ts: String = chrono::Utc::now().to_string();
     for (idx, (csensor, ctype, cvalue, cmp)) in settings.notification_constraints.iter().enumerate() {
         if sensor == *csensor && ctype == vtype {
             let sensor_name: &String = &settings.sensor_map[&sensor.to_string()];
