@@ -9,6 +9,7 @@ extern crate itertools;
 #[macro_use]
 extern crate diesel;
 extern crate chrono;
+extern crate time;
 
 pub mod common;
 pub mod schema;
@@ -28,7 +29,16 @@ struct SendQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest]).launch();
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let history = get_history(&connection, &settings);
+    for (s_id, values) in history {
+        println!("{}", s_id);
+        for (ts, t, h) in values {
+            println!("{}: {}, {}", ts, t, h);
+        }
+    }
+    //rocket::ignite().mount("/", routes![send,latest]).launch();
 }
 
 #[get("/api/send?<query>")]

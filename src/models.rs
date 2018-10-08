@@ -1,9 +1,12 @@
+
 use chrono::prelude::*;
 use super::schema::sensor_log;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use common::{Settings};
 use itertools::sorted;
+use time::Duration;
+use std::collections::{HashMap};
 
 
 #[derive(Queryable)]
@@ -53,13 +56,35 @@ pub fn get_latest_values(connection: &MysqlConnection, settings: &Settings) -> V
 
 }
 
+pub fn get_history(connection: &MysqlConnection, settings: &Settings) -> HashMap<i32, Vec<(String, f32, f32)>> {
+    use super::schema::sensor_log::dsl::*;
+    let begin = Utc::now().naive_utc() - Duration::days(1);
+    let mut history = HashMap::new();
+    for s_id in sorted(settings.sensor_map.keys()) {
+        let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
+        let mut values: Vec<(String, f32, f32)> = Vec::new();
+        let result = sensor_log.filter(sensor_id.eq(s_id))
+            .filter(timestamp.gt(begin))
+            .order_by(timestamp.asc())
+            .load::<Log>(connection)
+            .expect("Error loading sensor logs");
+        for log in result {
+            values.push((
+                log.timestamp.to_string(),
+                log.temperature.unwrap(),
+                log.humidity.unwrap()
+            ));
+        }
+        history.insert(s_id, values);
+    }
+    history
+}
 
 pub fn insert_values<'a>(connection: &MysqlConnection, settings: &Settings, sensor_id: &'a i32, temperature: &'a f32, humidity: &'a f32) {
     use schema::sensor_log;
     let new_log = NewLog {
         sensor_id: sensor_id,
         sensor_name: &settings.sensor_map[&sensor_id.to_string()],
-        //timestamp: &dsl::now,
         timestamp: &chrono::Utc::now().naive_utc(),
         temperature: temperature,
         humidity: humidity,
