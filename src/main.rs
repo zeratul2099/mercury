@@ -15,7 +15,6 @@ pub mod common;
 pub mod schema;
 pub mod models;
 
-use std::collections::{HashMap};
 use self::models::*;
 use rocket_contrib::Json;
 use common::{get_settings,check_notification,establish_connection};
@@ -44,7 +43,7 @@ fn send(query: SendQuery) -> &'static str {
 }
 
 #[get("/api/latest")]
-fn latest() -> Json<Vec<(String, String, String, f32, f32)>> {
+fn latest() -> Json<Vec<(String, String, String, f32, f32, bool)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let values = get_latest_values(&connection, &settings);
@@ -52,7 +51,7 @@ fn latest() -> Json<Vec<(String, String, String, f32, f32)>> {
 }
 
 #[get("/api/history")]
-fn history() -> Json<HashMap<i32, Vec<(String, f32, f32)>>> {
+fn history() -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let values = get_history(&connection, &settings);

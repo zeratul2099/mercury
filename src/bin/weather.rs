@@ -8,6 +8,7 @@ extern crate serde_json;
 extern crate itertools;
 #[macro_use] extern crate diesel;
 extern crate chrono;
+extern crate time;
 
 #[path = "../common.rs"]
 mod common;
