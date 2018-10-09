@@ -8,3 +8,9 @@ Home Sensor Network / Mercury provides a database backend for self-made Arduino/
 and air humidity surveillance and storing. The ESP32-code and circuit-diagram will will follow later here.
 
 TODO: port all hsn-features
+    - webgui with templates (tera as jinja2-replacement)
+    - plots with plotly.js
+    - wouldbe-values
+    - daily mean
+    - weather forecast
+    - serial-receiver for old arduino sensors
