@@ -15,8 +15,10 @@ pub mod common;
 pub mod schema;
 pub mod models;
 
+use std::path::{Path, PathBuf};
 use self::models::*;
 use rocket_contrib::Json;
+use rocket::response::NamedFile;
 use common::{get_settings,check_notification,establish_connection};
 
 
@@ -29,7 +31,7 @@ struct SendQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history]).launch();
+    rocket::ignite().mount("/", routes![send,latest,history,files]).launch();
 }
 
 #[get("/api/send?<query>")]
@@ -56,4 +58,9 @@ fn history() -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     let connection = establish_connection(&settings);
     let values = get_history(&connection, &settings);
     Json(values)
+}
+
+#[get("/static/<file..>")]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
 }
