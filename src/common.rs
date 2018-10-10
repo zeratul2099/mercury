@@ -13,6 +13,37 @@ lazy_static! {
     static ref NOTIFIED: Mutex<HashSet<usize>> = Mutex::new(HashSet::new());
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct WeatherData {
+    pub latitude: f64,
+    pub longitude: f64,
+    pub timezone: String,
+    pub offset: i32,
+    pub currently: Currently,
+
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[allow(non_snake_case)]
+pub struct Currently {
+    pub time: i32,
+    pub summary: String,
+    pub icon: String,
+    pub precipIntensity: i32,
+    pub precipProbability: i32,
+    pub temperature: f32,
+    pub apparentTemperature: f64,
+    pub dewPoint: f64,
+    pub humidity: f32,
+    pub pressure: f64,
+    pub windSpeed: f64,
+    pub windGust: f64,
+    pub windBearing: i32,
+    pub cloudCover: f64,
+    pub uvIndex: i32,
+    pub visibility: f64,
+    pub ozone: f64,
+}
 pub struct Settings {
     #[allow(dead_code)]
     pub device: String,

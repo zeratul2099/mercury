@@ -1,0 +1,19 @@
+{% extends "base" %}
+        {% block content %}
+        <h3>Current weather conditions</h3>
+        <h2>{{ conditions.currently.summary }}</h2>
+        <table>
+            <tr><td>Temperature</td><td>{{ conditions.currently.temperature | round(precision=1) }}&#176;C</td></tr>
+            <tr><td>Apparent Temperature</td><td>{{ conditions.currently.apparentTemperature | round(precision=1) }}&#176;C</td></tr>
+            <tr><td>Relative Humidity</td><td>{{ conditions.currently.humidity | round(precision=2) }}{#&#37#};</td></tr>
+            <tr><td>Dew Point</td><td>{{ conditions.currently.dewPoint }}&#176;C</td></tr>
+            <tr><td>Pressure</td><td>{{ conditions.currently.pressure }}hPa</td></tr>
+            <tr><td>Wind Speed</td><td>{{ conditions.currently.windSpeed }}m/s</td></tr>
+            <tr><td>Wind Direction</td><td>{{ conditions.currently.windBearing }}&#176;</td></tr>
+            <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
+            <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
+            <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
+            <tr><td>Status from</td><td>{{ conditions.currently.time }} TODO: convert</td></tr>
+
+        </table>
+        {% endblock content %}

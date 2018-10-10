@@ -5,6 +5,9 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate itertools;
 #[macro_use] extern crate lazy_static;
+#[macro_use] extern crate serde_derive;
+extern crate serde;
+extern crate serde_json;
 
 #[macro_use]
 extern crate diesel;
@@ -17,11 +20,13 @@ pub mod models;
 
 use std::collections::{HashMap};
 use std::path::{Path, PathBuf};
+use std::io::prelude::*;
+use std::fs::File;
 use self::models::*;
 use rocket_contrib::Json;
 use rocket::response::NamedFile;
 use rocket_contrib::Template;
-use common::{get_settings,check_notification,establish_connection};
+use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
 
@@ -33,7 +38,7 @@ struct SendQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots]).attach(Template::fairing()).launch();
+    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,weather]).attach(Template::fairing()).launch();
 }
 
 #[get("/simple")]
@@ -52,6 +57,16 @@ fn plots() -> Template {
     Template::render("plots", context)
 }
 
+#[get("/weather")]
+fn weather() -> Template {
+    let mut file = File::open("weatherdump.json").unwrap();
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
+    let mut context = HashMap::new();
+    context.insert("conditions".to_string(), conditions);
+    Template::render("weather", context)
+}
 #[get("/api/send?<query>")]
 fn send(query: SendQuery) -> &'static str {
     let settings = get_settings();

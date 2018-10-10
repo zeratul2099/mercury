@@ -19,40 +19,9 @@ mod schema;
 
 
 use std::fs::File;
-use common::{get_settings,establish_connection};
+use common::{get_settings,establish_connection,WeatherData};
 use self::models::{insert_values};
 
-#[derive(Deserialize, Serialize, Debug)]
-struct WeatherData {
-    latitude: f64,
-    longitude: f64,
-    timezone: String,
-    offset: i32,
-    currently: Currently,
-
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[allow(non_snake_case)]
-struct Currently {
-    time: i32,
-    summary: String,
-    icon: String,
-    precipIntensity: i32,
-    precipProbability: i32,
-    temperature: f32,
-    apparentTemperature: f64,
-    dewPoint: f64,
-    humidity: f32,
-    pressure: f64,
-    windSpeed: f64,
-    windGust: f64,
-    windBearing: i32,
-    cloudCover: f64,
-    uvIndex: i32,
-    visibility: f64,
-    ozone: f64,
-}
 
 fn main() {
     let settings = get_settings();
