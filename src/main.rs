@@ -15,10 +15,12 @@ pub mod common;
 pub mod schema;
 pub mod models;
 
+use std::collections::{HashMap};
 use std::path::{Path, PathBuf};
 use self::models::*;
 use rocket_contrib::Json;
 use rocket::response::NamedFile;
+use rocket_contrib::Template;
 use common::{get_settings,check_notification,establish_connection};
 
 
@@ -31,7 +33,23 @@ struct SendQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history,files]).launch();
+    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots]).attach(Template::fairing()).launch();
+}
+
+#[get("/simple")]
+fn simple() -> Template {
+    let mut context = HashMap::new();
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_latest_values(&connection, &settings);
+    context.insert("latest_values".to_string(), values);
+    Template::render("simple", context)
+}
+
+#[get("/plots")]
+fn plots() -> Template {
+    let context = HashMap::<String, String>::new();
+    Template::render("plots", context)
 }
 
 #[get("/api/send?<query>")]

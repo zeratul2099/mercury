@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/styles.css">
+        <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+        <title>Mercury</title>
+{% block head %}{% endblock head %}
+    </head>
+    <body>
+    <div id='header'>
+            <div><h3>
+                <a href='/'>Table</a> 
+                <a href='/simple'>Simple</a>
+                <a href='/mean'>Daily Mean</a>
+                <a href='/plots'>Plots</a>
+                <a href='/gauges'>Gauges</a>
+                <a href='/weather'>Weather</a>
+            </h3></div>
+    </div>
+        {% block bodyscript %}{% endblock bodyscript %}
+        <div id='content_container' class='content'>
+        {% block content %}{% endblock content %}
+        </div>
+        <div id='footer'>Outside <a style='color: lightgray' href='https://darksky.net/poweredby/'>Powered by Darksky</a></div>
+    </body>
+</html>
