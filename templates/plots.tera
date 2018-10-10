@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="/static/styles.css">
-        <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
-        <title>Mercury</title>
+{% extends "base" %}
+    {% block head %}
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css" integrity="sha256-hzfEy51WIdFRQy2Hu0Nl5eWTbzT4Kt4ISYYBLyUmfdc=" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js" integrity="sha256-YFb6LRHZK5yxS5TfpJh3oJWxUBqjSO4FXKLFlOYmXW4=" crossorigin="anonymous"></script>
@@ -12,18 +8,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js" integrity="sha256-KWJ8UAzTsBeD0NSrtjVU1HDTi8q122/7N1KFmkz2pbw=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.min.js" integrity="sha256-OoJG8W1DcTljKNuhaxS3MuQF3auFpCVBUUEcH1sOJtA=" crossorigin="anonymous"></script>
 
-    <body>
-    <div id='header'>
-            <div><h3>
-                <a href='/'>Table</a> 
-                <a href='/simple'>Simple</a>
-                <a href='/mean'>Daily Mean</a>
-                <a href='/plots'>Plots</a>
-                <a href='/gauges'>Gauges</a>
-                <a href='/weather'>Weather</a>
-            </h3></div>
-    </div>
-
+    {% endblock head %}
+    {% block bodyscript %}
 		<script type='text/javascript'>
 $(document).ready(function () {
     update_plot = function(plot_id, data) {
@@ -96,6 +82,8 @@ $(document).ready(function () {
 
 	})
 		</script>
+	{% endblock bodyscript %}
+	{% block content %}
         <h3>Plots</h3>
         <input type='submit' id='update_button' value='update' class='jsbtn' />
         <script>
@@ -109,7 +97,4 @@ $(document).ready(function () {
                 Relative Humidity
             </h4>
 			<div id='chart_h'></div>
-        </div>
-        <div id='footer'>Outside <a style='color: lightgray' href='https://darksky.net/poweredby/'>Powered by Darksky</a></div>
-    </body>
-</html>
+	{% endblock content %}
