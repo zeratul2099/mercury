@@ -13,7 +13,7 @@
             <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
             <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
             <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
-            <tr><td>Status from</td><td>{{ conditions.currently.time }} TODO: convert</td></tr>
+            <tr><td>Status from</td><td>{{ timestamp }}</td></tr>
 
         </table>
         {% endblock content %}

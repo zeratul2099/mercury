@@ -26,6 +26,7 @@ use self::models::*;
 use rocket_contrib::Json;
 use rocket::response::NamedFile;
 use rocket_contrib::Template;
+use chrono::prelude::*;
 use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
@@ -57,14 +58,24 @@ fn plots() -> Template {
     Template::render("plots", context)
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+struct WeatherContext {
+    conditions: WeatherData,
+    timestamp: String,
+}
+
 #[get("/weather")]
 fn weather() -> Template {
     let mut file = File::open("weatherdump.json").unwrap();
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
     let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
-    let mut context = HashMap::new();
-    context.insert("conditions".to_string(), conditions);
+    let ts = conditions.currently.time;
+    let ts = Utc.timestamp(ts as i64, 0).to_string();
+    let context = WeatherContext {
+        conditions: conditions,
+        timestamp: ts,
+    };
     Template::render("weather", context)
 }
 #[get("/api/send?<query>")]
