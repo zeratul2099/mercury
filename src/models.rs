@@ -71,6 +71,7 @@ pub fn get_latest_values(connection: &MysqlConnection, settings: &Settings) -> V
 pub fn get_history(connection: &MysqlConnection, settings: &Settings) -> Vec<(i32, String, Vec<(String, f32, f32)>)> {
     use super::schema::sensor_log::dsl::*;
     let begin = Utc::now().naive_utc() - Duration::days(1);
+    let tz: Tz = settings.timezone.parse().unwrap();
     let mut history = Vec::new();
     for (s_id, s_name) in sorted(&settings.sensor_map) {
         let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
@@ -82,8 +83,10 @@ pub fn get_history(connection: &MysqlConnection, settings: &Settings) -> Vec<(i3
             .load::<Log>(connection)
             .expect("Error loading sensor logs");
         for log in result {
+            let ts = Utc.from_local_datetime(&log.timestamp).unwrap();
+            let ts: String = ts.with_timezone(&tz).naive_local().to_string();
             values.push((
-                log.timestamp.to_string(),
+                ts,
                 log.temperature.unwrap(),
                 log.humidity.unwrap()
             ));
