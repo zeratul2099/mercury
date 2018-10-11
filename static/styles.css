@@ -2,7 +2,7 @@ body
 		{
 	margin:0;
 	padding:0;
-        font-family:monospace;
+        font-family:monospace,Courier New,Courier New;
         background:#F5F5F5;
 		}
         
@@ -11,7 +11,7 @@ body
     margin: 0 0 0.7em;
     background:#1f1f1f;
     color:#f0f0f0;
-    font-family:'Orbitron', 'monospace';
+    font-family:monospace,Courier New,Courier New;
     text-align:center;
     padding:10px;
     border-bottom:2px outset #FF0000;
@@ -37,7 +37,7 @@ body
 			bottom:0px;
 			background:#1f1f1f;
 			text-align:center;
-            font-family:monospace;
+            font-family:monospace,Courier New;
             color:#ffffff;
 			width:100%;
             font-size:1em;
@@ -135,17 +135,17 @@ border-collapse: collapse;
 
 .tablehdr {
     text-shadow: 2px 3px 3px grey;
-    font-family:'Orbitron', 'monospace';
+    font-family:monospace,Courier New;
 }
 
 h3 {
     text-shadow: 2px 3px 3px grey;
-    font-family:'Orbitron', 'monospace';
+    font-family:monospace,Courier New;
 }
 
 h4 {
   text-shadow: 2px 3px 3px grey;
-  font-family:'Orbitron', 'monospace';
+  font-family:monospace,Courier New;
   font-size: 80%;
 }
 
@@ -208,7 +208,7 @@ a.button {
     -moz-transition-duration: 0.5s;
     -webkit-transition-property: all;
     -webkit-transition-duration: 0.5s;
-    font-family:'Orbitron', 'monospace';
+    font-family:monospace,Courier New;
 }
 
 a.leftbutton {
