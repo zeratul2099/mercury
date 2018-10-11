@@ -39,7 +39,7 @@ struct SendQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,weather]).attach(Template::fairing()).launch();
+    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,weather,gauges]).attach(Template::fairing()).launch();
 }
 
 #[get("/simple")]
@@ -56,6 +56,14 @@ fn simple() -> Template {
 fn plots() -> Template {
     let context = HashMap::<String, String>::new();
     Template::render("plots", context)
+}
+
+#[get("/gauges")]
+fn gauges() -> Template {
+    let settings = get_settings();
+    let mut context = HashMap::new();
+    context.insert("num_sensors".to_string(), settings.sensor_map.len());
+    Template::render("gauges", context)
 }
 
 #[derive(Deserialize, Serialize, Debug)]

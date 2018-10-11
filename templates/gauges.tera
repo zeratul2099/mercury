@@ -1,0 +1,94 @@
+{% extends "base" %}
+    {% block head %}
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css" integrity="sha256-hzfEy51WIdFRQy2Hu0Nl5eWTbzT4Kt4ISYYBLyUmfdc=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js" integrity="sha256-YFb6LRHZK5yxS5TfpJh3oJWxUBqjSO4FXKLFlOYmXW4=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.meterGaugeRenderer.min.js" integrity="sha256-LnZqi1XCI+RMK9DiMCXcE6zTvYR00PWzlTm237LRx9I=" crossorigin="anonymous"></script>
+    {% endblock head %}
+    {% block bodyscript %}
+		<script type='text/javascript'>
+$(document).ready(function () {
+    
+    update_plot = function(plot_id, data, is_temperature) {
+        // data: sensor_id, sensor_name, timestamp, temp, hum
+        if (is_temperature) {
+            var value = data[3]
+            var svalue = data[3] + '&#176;C'
+            var max_value = 50
+            var intervals = [15, 25, 40, 50]
+            var intervalColors = ['#268bd2', '#859900', '#c59900', '#dc322f']
+        } else {
+            var value = data[4]
+            var svalue = data[4] + '&#37;'
+            var max_value = 100
+            var intervals = [40, 60, 100]
+            var intervalColors = ['#c59900', '#859900', '#c59900']
+        }
+        var title = data[1] + ': ' + svalue
+        var plot = $.jqplot(plot_id, [[value]], {
+            title: title,
+            height: 300,
+            width: 400,
+            seriesDefaults: {
+                renderer: $.jqplot.MeterGaugeRenderer,
+                rendererOptions: {
+                    label: data[2],
+                    labelPosition: 'bottom',
+                    min: 0,
+                    max: max_value,
+                    intervalOuterRadius: 100,
+                    intervals: intervals,
+                    intervalColors: intervalColors
+
+                
+                }
+            }
+        
+        
+        })
+        $(window).resize(function() {
+                    plot.replot( { resetAxes: true } );
+            });
+    }
+
+    latest_callback = function(res, status) {
+        if (status == "success") {
+            data = JSON.parse(res.responseText)
+            $.each(data, function(idx, tuple) {
+                update_plot('chart_t_' + (idx+1), tuple, true)
+                update_plot('chart_h_' + (idx+1), tuple, false)
+            })
+        }
+
+    }
+
+    call_update = function() {
+        var args = {type: 'GET', url: '../api/latest', complete: latest_callback}
+        $.ajax(args)
+    }
+
+    call_update()
+	})
+		</script>
+	{% endblock bodyscript %}
+	{% block content %}
+        <h3>Gauges</h3>
+        <input type='submit' id='update_button' value='update' class='jsbtn' />
+        <script>
+        $('#update_button').click(function() { call_update() })
+        </script>
+            <h4 style='text-align: center'>
+                Temperature
+            </h4>
+            <div>
+            {% for idx in range(end=num_sensors) %}
+			<div style='height: 300; width: 400;' id='chart_t_{{ loop.index }}'></div>
+			{% endfor %}
+			</div>
+            <h4 style='text-align: center'>
+                Relative Humidity
+            </h4>
+            {% for idx in range(end=num_sensors) %}
+			<div style='height: 300; width: 400;' id='chart_h_{{ loop.index }}'></div>
+			{% endfor %}
+        {% endblock content %}
