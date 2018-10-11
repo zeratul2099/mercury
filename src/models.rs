@@ -1,5 +1,6 @@
 
 use chrono::prelude::*;
+use chrono_tz::Tz;
 use super::schema::sensor_log;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
@@ -32,6 +33,7 @@ pub fn get_latest_values(connection: &MysqlConnection, settings: &Settings) -> V
     use super::schema::sensor_log::dsl::*;
     let mut latest_values: Vec<(String, String, String, f32, f32, bool)> = Vec::new();
     let now = Utc::now().naive_utc();
+    let tz: Tz = settings.timezone.parse().unwrap();
     for s_id in sorted(settings.sensor_map.keys()) {
         let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
         let result = sensor_log.filter(sensor_id.eq(s_id))
@@ -49,10 +51,12 @@ pub fn get_latest_values(connection: &MysqlConnection, settings: &Settings) -> V
             } else {
                 too_old = false;
             }
+            let ts = Utc.from_local_datetime(&log.timestamp).unwrap();
+            let ts: String = ts.with_timezone(&tz).to_string();
             latest_values.push((
                 log.sensor_id.to_string(),
                 log.sensor_name.unwrap(),
-                log.timestamp.to_string(),
+                ts,
                 log.temperature.unwrap(),
                 log.humidity.unwrap(),
                 too_old

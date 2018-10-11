@@ -12,6 +12,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate diesel;
 extern crate chrono;
+extern crate chrono_tz;
 extern crate time;
 
 pub mod common;
@@ -27,6 +28,7 @@ use rocket_contrib::Json;
 use rocket::response::NamedFile;
 use rocket_contrib::Template;
 use chrono::prelude::*;
+use chrono_tz::Tz;
 use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
@@ -74,12 +76,15 @@ struct WeatherContext {
 
 #[get("/weather")]
 fn weather() -> Template {
+    let settings = get_settings();
     let mut file = File::open("weatherdump.json").unwrap();
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
     let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
     let ts = conditions.currently.time;
-    let ts = Utc.timestamp(ts as i64, 0).to_string();
+    let ts = Utc.timestamp(ts as i64, 0);
+    let tz: Tz = settings.timezone.parse().unwrap();
+    let ts = ts.with_timezone(&tz).to_string();
     let context = WeatherContext {
         conditions: conditions,
         timestamp: ts,

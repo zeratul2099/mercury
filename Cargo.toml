@@ -8,6 +8,7 @@ default-run = "mercury"
 
 [dependencies]
 chrono = "*"
+chrono-tz = "0.5"
 yaml-rust = "0.4"
 diesel = { version = "1.0.0", features = ["mysql", "chrono"] }
 rocket = "0.3.17"

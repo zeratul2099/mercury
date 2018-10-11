@@ -8,6 +8,7 @@ use std::fs::File;
 use self::yaml_rust::{yaml};
 use diesel::prelude::*;
 use diesel::mysql::MysqlConnection;
+use chrono_tz::Tz;
 
 lazy_static! {
     static ref NOTIFIED: Mutex<HashSet<usize>> = Mutex::new(HashSet::new());
@@ -112,7 +113,9 @@ fn send_pushover_message(settings: &Settings, message: String) {
 }
 
 pub fn check_notification(settings: &Settings, sensor: i64, vtype: &String, value: f64) {
-    let ts: String = chrono::Utc::now().to_string();
+    let ts = chrono::Utc::now();
+    let tz: Tz = settings.timezone.parse().unwrap();
+    let ts = ts.with_timezone(&tz).to_string();
     for (idx, (csensor, ctype, cvalue, cmp)) in settings.notification_constraints.iter().enumerate() {
         if sensor == *csensor && ctype == vtype {
             let sensor_name: &String = &settings.sensor_map[&sensor.to_string()];
