@@ -9,7 +9,6 @@ and air humidity surveillance and storing. The ESP32-code and circuit-diagram wi
 
 TODO: port all hsn-features
     - webgui with templates (tera as jinja2-replacement)
-    - Timezones
     - plots with plotly.js
     - wouldbe-values
     - daily mean
