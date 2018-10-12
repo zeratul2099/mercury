@@ -40,8 +40,13 @@ struct SendQuery {
     h: f32,
 }
 
+#[derive(FromForm)]
+struct PlotQuery {
+    old: bool,
+}
+
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,weather,gauges]).attach(Template::fairing()).launch();
+    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges]).attach(Template::fairing()).launch();
 }
 
 #[get("/simple")]
@@ -58,6 +63,12 @@ fn simple() -> Template {
 fn plots() -> Template {
     let context = HashMap::<String, String>::new();
     Template::render("plots", context)
+}
+
+#[get("/oldplots")]
+fn oldplots() -> Template {
+    let context = HashMap::<String, String>::new();
+    Template::render("plots_old", context)
 }
 
 #[get("/gauges")]
