@@ -1,68 +1,44 @@
 {% extends "base" %}
     {% block head %}
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css" integrity="sha256-hzfEy51WIdFRQy2Hu0Nl5eWTbzT4Kt4ISYYBLyUmfdc=" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js" integrity="sha256-YFb6LRHZK5yxS5TfpJh3oJWxUBqjSO4FXKLFlOYmXW4=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.dateAxisRenderer.min.js" integrity="sha256-mEsxAIeQZyLhN2ZJLKrNOYEMI2mLEgvCGHeNxE+1Mj4=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.cursor.min.js" integrity="sha256-Zf0xVwgG+AaITEnZq3uaBUt6c8+NOXc+xPjXI0DWNxY=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js" integrity="sha256-KWJ8UAzTsBeD0NSrtjVU1HDTi8q122/7N1KFmkz2pbw=" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.min.js" integrity="sha256-OoJG8W1DcTljKNuhaxS3MuQF3auFpCVBUUEcH1sOJtA=" crossorigin="anonymous"></script>
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.40.1/plotly.min.js" integrity="sha256-z/b0+XRJAL1httncWk8tIGxLYz7GSHo4WidyoH1qdLE=" crossorigin="anonymous"></script>
     {% endblock head %}
     {% block bodyscript %}
 		<script type='text/javascript'>
 $(document).ready(function () {
     update_plot = function(plot_id, data) {
-        var values = []
-        var series_data = []
+        var pldata = []
+        if (plot_id == "chart_t") {
+            var plotname = "Temperature"
+        } else {
+            var plotname = "Relative Humidity"
+        }
         $.each(data, function(idx, sensor_data) {
-            if (plot_id == "chart_t") {
-                red = sensor_data[2].map(x => [x[0], x[1]])
-            } else {
-                red = sensor_data[2].map(x => [x[0], x[2]])
+            pltrace = {
+                type: 'scatter',
+                mode: 'lines',
+                name: sensor_data[1],
+                x: sensor_data[2].map(x => x[0].slice(0, -3)),
             }
-            values.push(red)
-            series_data.push({label: sensor_data[1]})
+            if (plot_id == "chart_t") {
+                pltrace.y = sensor_data[2].map(x => x[1])
+                shapes = []
+            } else {
+                pltrace.y = sensor_data[2].map(x => x[2])
+                shapes = []
+            }
+            pldata.push(pltrace)
         })
-        $(plot_id).empty()
-        var plot = $.jqplot(plot_id, values, {
-            // animate: true,
-            // animateReplot: true,
-            cursor: {
-                show: true,
-                zoom: true,
-                looseZoom: true,
-                showTooltip: false,
-            },
-            highlighter: {
-                show: true,
-            },
-            legend: {
-                show: true,
-                location: 'nw',
-                renderer: $.jqplot.EnhancedLegendRenderer,
-                rendererOptions: {
-                    seriesToggle: 'normal',
-                },
-            },
-            axes:{
-                xaxis:{
-                    renderer:$.jqplot.DateAxisRenderer
-                },
-                yaxis:{
-                    tickOptions: {
-                        formatString: '%#.1f',
-                    },
-                },
-            },
-            seriesDefaults: {
-                showMarker: false,
-            },
-            series: series_data,
-        })
-        $(window).resize(function() {
-                    plot.replot( { resetAxes: true } );
-            });
+        layout = {
+            title: plotname,
+            xaxis: { type: 'date' },
+            yaxis: { type: 'linear' },
+            shapes: shapes,
+//            paper_bgcolor: 'rgba(0,0,0,0)',
+//            plot_bgcolor: 'rgba(0,0,0,0)'
+        }
+        Plotly.newPlot(plot_id, pldata, layout)
+
     }
    
 
@@ -80,6 +56,8 @@ $(document).ready(function () {
 
     call_update()
 
+
+
 	})
 		</script>
 	{% endblock bodyscript %}
@@ -89,12 +67,8 @@ $(document).ready(function () {
         <script>
         $('#update_button').click(function() { call_update() })
         </script>
-            <h4 style='text-align: center'>
-                Temperature
-            </h4>
+            <hr>
 			<div id='chart_t'></div>
-            <h4 style='text-align: center'>
-                Relative Humidity
-            </h4>
+			<hr>
 			<div id='chart_h'></div>
 	{% endblock content %}
