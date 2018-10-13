@@ -12,5 +12,5 @@ TODO: port all hsn-features
     - plots with plotly.js
     - wouldbe-values
     - daily mean
-    - weather forecast
+    - weather forecast + icons
     - serial-receiver for old arduino sensors
