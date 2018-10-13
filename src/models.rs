@@ -84,11 +84,19 @@ pub fn get_history(connection: &MysqlConnection, settings: &Settings) -> Vec<(i3
             .expect("Error loading sensor logs");
         for log in result {
             let ts = Utc.from_local_datetime(&log.timestamp).unwrap();
+            let t = match log.temperature {
+                None => continue,
+                Some(t) => t,
+            };
+            let h = match log.humidity {
+                None => continue,
+                Some(h) => h,
+            };
             let ts: String = ts.with_timezone(&tz).naive_local().to_string();
             values.push((
                 ts,
-                log.temperature.unwrap(),
-                log.humidity.unwrap()
+                t,
+                h
             ));
         }
         history.push((s_id, s_name, values));
