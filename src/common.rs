@@ -19,19 +19,36 @@ pub struct WeatherData {
     pub latitude: f64,
     pub longitude: f64,
     pub timezone: String,
-    pub offset: i32,
-    pub currently: Currently,
+    pub currently: HourData,
+    pub hourly: HourSet,
+    pub daily: DaySet,
 
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 #[allow(non_snake_case)]
-pub struct Currently {
+pub struct DaySet {
+    pub summary: String,
+    pub icon: String,
+    pub data: Vec<DayData>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[allow(non_snake_case)]
+pub struct HourSet {
+    pub summary: String,
+    pub icon: String,
+    pub data: Vec<HourData>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[allow(non_snake_case)]
+pub struct HourData {
     pub time: i32,
     pub summary: String,
     pub icon: String,
-    pub precipIntensity: i32,
-    pub precipProbability: i32,
+    pub precipIntensity: f32,
+    pub precipProbability: f32,
     pub temperature: f32,
     pub apparentTemperature: f64,
     pub dewPoint: f64,
@@ -45,6 +62,42 @@ pub struct Currently {
     pub visibility: f64,
     pub ozone: f64,
 }
+
+#[derive(Deserialize, Serialize, Debug)]
+#[allow(non_snake_case)]
+pub struct DayData {
+    pub time: i32,
+    pub summary: String,
+    pub icon: String,
+    pub sunriseTime: i32,
+    pub sunsetTime: i32,
+    pub moonPhase: f32,
+    pub precipIntensity: f32,
+    pub precipIntensityMax: f32,
+    pub precipIntensityMaxTime: i32,
+    pub precipProbability: f32,
+    pub temperatureHigh: f32,
+    pub temperatureHighTime: i32,
+    pub temperatureLow: f32,
+    pub temperatureLowTime: i32,
+    pub apparentTemperatureHigh: f32,
+    pub apparentTemperatureHighTime: i32,
+    pub apparentTemperatureLow: f32,
+    pub apparentTemperatureLowTime: i32,
+    pub dewPoint: f32,
+    pub humidity: f32,
+    pub pressure: f32,
+    pub windSpeed: f32,
+    pub windGust: f32,
+    pub windGustTime: i32,
+    pub windBearing: i32,
+    pub cloudCover: f32,
+    pub uvIndex: i32,
+    pub uvIndexTime: i32,
+    pub visibility: f64,
+    pub ozone: f64,
+}
+
 pub struct Settings {
     #[allow(dead_code)]
     pub device: String,

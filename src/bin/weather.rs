@@ -26,7 +26,7 @@ use self::models::{insert_values};
 
 fn main() {
     let settings = get_settings();
-    let url = format!("https://api.darksky.net/forecast/{}/{},{}?exclude=minutely,hourly,daily,alerts,flags&units=si", settings.darksky_api_key, settings.lat_lon.0, settings.lat_lon.1);
+    let url = format!("https://api.darksky.net/forecast/{}/{},{}?exclude=minutely,alerts,flags&units=si", settings.darksky_api_key, settings.lat_lon.0, settings.lat_lon.1);
     let content: WeatherData = reqwest::get(url.as_str()).unwrap().json().unwrap(); //.expect("weather request failed");
     println!("t: {}, h: {}, {}, wspd: {}", content.currently.temperature, content.currently.humidity * 100.0, content.currently.summary, content.currently.windSpeed);
     println!("{}", serde_json::to_string_pretty(&content).unwrap());
