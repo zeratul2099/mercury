@@ -8,6 +8,8 @@ use std::fs::File;
 use self::yaml_rust::{yaml};
 use diesel::prelude::*;
 use diesel::mysql::MysqlConnection;
+use chrono::{DateTime, Utc};
+use chrono::serde::ts_seconds;
 use chrono_tz::Tz;
 
 lazy_static! {
@@ -44,7 +46,8 @@ pub struct HourSet {
 #[derive(Deserialize, Serialize, Debug)]
 #[allow(non_snake_case)]
 pub struct HourData {
-    pub time: i32,
+    #[serde(with = "ts_seconds")]
+    pub time: DateTime<Utc>,
     pub summary: String,
     pub icon: String,
     pub precipIntensity: f32,
@@ -66,7 +69,8 @@ pub struct HourData {
 #[derive(Deserialize, Serialize, Debug)]
 #[allow(non_snake_case)]
 pub struct DayData {
-    pub time: i32,
+    #[serde(with = "ts_seconds")]
+    pub time: DateTime<Utc>,
     pub summary: String,
     pub icon: String,
     pub sunriseTime: i32,
@@ -97,6 +101,7 @@ pub struct DayData {
     pub visibility: f64,
     pub ozone: f64,
 }
+
 
 pub struct Settings {
     #[allow(dead_code)]

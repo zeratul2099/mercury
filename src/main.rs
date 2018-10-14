@@ -32,7 +32,6 @@ use chrono_tz::Tz;
 use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
-
 #[derive(FromForm)]
 struct SendQuery {
     id: i32,
@@ -46,7 +45,13 @@ struct PlotQuery {
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges]).attach(Template::fairing()).launch();
+    rocket::ignite()
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges])
+          .attach(Template::fairing())
+//        .attach(Template::custom(|engines| {
+//            engines.tera.register_global_function("convert_tz", convert_tz);
+//        }))
+        .launch();
 }
 
 #[get("/simple")]
@@ -83,6 +88,7 @@ fn gauges() -> Template {
 struct WeatherContext {
     conditions: WeatherData,
     timestamp: String,
+    timezone_name: String,
 }
 
 #[get("/weather")]
@@ -92,16 +98,21 @@ fn weather() -> Template {
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
     let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
-    let ts = conditions.currently.time;
-    let ts = Utc.timestamp(ts as i64, 0);
-    let tz: Tz = settings.timezone.parse().unwrap();
-    let ts = ts.with_timezone(&tz).to_string();
+    let ts = convert_tz(conditions.currently.time, &settings.timezone).to_string();
     let context = WeatherContext {
         conditions: conditions,
         timestamp: ts,
+        timezone_name: settings.timezone,
     };
     Template::render("weather", context)
 }
+
+fn convert_tz(datetime: DateTime<Utc>, timezone: &String) -> DateTime<chrono_tz::Tz> {
+    let timezone: Tz = timezone.parse().unwrap();
+    let datetime = datetime.with_timezone(&timezone);
+    datetime
+}
+
 #[get("/api/send?<query>")]
 fn send(query: SendQuery) -> &'static str {
     let settings = get_settings();

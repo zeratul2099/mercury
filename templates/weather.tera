@@ -14,6 +14,7 @@
             <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
             <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
             <tr><td>Status from</td><td>{{ timestamp }}</td></tr>
+            {#<tr><td>Status from</td><td>{{ conditions.currently.time)|date(format="%Y-%m-%d %H:%M") }}</td></tr>#}
 
         </table>
         {% endblock content %}
