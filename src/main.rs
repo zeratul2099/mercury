@@ -47,10 +47,10 @@ struct PlotQuery {
 fn main() {
     rocket::ignite()
         .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges])
-          .attach(Template::fairing())
-//        .attach(Template::custom(|engines| {
-//            engines.tera.register_global_function("convert_tz", convert_tz);
-//        }))
+//          .attach(Template::fairing())
+        .attach(Template::custom(|engines| {
+            engines.tera.register_global_function("convert_tz", convert_tz);
+        }))
         .launch();
 }
 
