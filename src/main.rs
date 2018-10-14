@@ -1,8 +1,7 @@
 #![allow(proc_macro_derive_resolution_fallback,dead_code)]
-#![feature(plugin, custom_derive)]
-#![plugin(rocket_codegen)]
-extern crate rocket;
-extern crate rocket_contrib;
+#![feature(plugin, custom_derive,proc_macro_hygiene,decl_macro)]
+#[macro_use] extern crate rocket;
+#[macro_use] extern crate rocket_contrib;
 extern crate itertools;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
@@ -24,9 +23,9 @@ use std::path::{Path, PathBuf};
 use std::io::prelude::*;
 use std::fs::File;
 use self::models::*;
-use rocket_contrib::Json;
+use rocket_contrib::json::Json;
 use rocket::response::NamedFile;
-use rocket_contrib::Template;
+use rocket_contrib::templates::Template;
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use common::{get_settings,check_notification,establish_connection,WeatherData};
