@@ -1,37 +1,102 @@
 {% extends "base" %}
+    {% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha256-rByPlHULObEjJ6XQxW/flG2r+22R5dKiAoef+aXWfik=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
+    {% endblock head %}
+    {% block bodyscript %}
+    <script type='text/javascript'>
+        $(document).ready(function () {
+            $( "#tabs" ).tabs();
+        })
+    </script>
+    {% endblock bodyscript %}
+
         {% block content %}
-
-        <h2>Current weather conditions</h2>
-        <h3>{{ conditions.currently.summary }}</h3>
-        <table>
-            <tr><td>Temperature</td><td>{{ conditions.currently.temperature | round(precision=1) }}&#176;C</td></tr>
-            <tr><td>Apparent Temperature</td><td>{{ conditions.currently.apparentTemperature | round(precision=1) }}&#176;C</td></tr>
-            <tr><td>Relative Humidity</td><td>{{ conditions.currently.humidity | round(precision=2) }}{#&#37;#}</td></tr>
-            <tr><td>Dew Point</td><td>{{ conditions.currently.dewPoint }}&#176;C</td></tr>
-            <tr><td>Pressure</td><td>{{ conditions.currently.pressure }}hPa</td></tr>
-            <tr><td>Wind Speed</td><td>{{ conditions.currently.windSpeed }}m/s</td></tr>
-            <tr><td>Wind Direction</td><td>{{ conditions.currently.windBearing }}&#176;</td></tr>
-            <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
-            <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
-            <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
-            <tr><td>Status from</td><td>{{ convert_tz(datetime=conditions.currently.time, format="%Y-%m-%d %H:%M:%S") }}</td></tr>
-
-        </table>
-        <h2>Next days</h2>
-        <h3>{{ conditions.daily.summary }}</h3>
-        <table>
-        {% for day_data in conditions.daily.data %}
-        <tr>
-            <td>{{ convert_tz(datetime=day_data.time, format="%Y-%m-%d") }}</td>
-            <td>{{ day_data.summary }}</td>
-            <td>{{ day_data.temperatureLow | round(precision=1) }}&#176;C</td>
-            <td>{{ day_data.temperatureHigh | round(precision=1) }}&#176;C</td>
-            <td>{{ day_data.windSpeed | round(precision=1) }} m/s</td>
-            <td>{{ day_data.pressure | round(precision=1) }} hPa</td>
-            <td>{{ day_data.cloudCover | round(precision=1)}}</td>
-            <td>{{ day_data.ozone }}</td>
-
-        </tr>
-        {% endfor %}
-        </table>
+        <div id="tabs">
+            <ul>
+                <li><a href="#tab-currently">Currently</a></li>
+                <li><a href="#tab-hourly">Hourly</a></li>
+                <li><a href="#tab-daily">Daily</a></li>
+            </ul>
+            <div id="tab-currently">
+                <h2>Current weather conditions</h2>
+                <h3>{{ conditions.currently.summary }}</h3>
+                <table>
+                    <tr><td>Temperature</td><td>{{ conditions.currently.temperature | round(precision=1) }}&#176;C</td></tr>
+                    <tr><td>Apparent Temperature</td><td>{{ conditions.currently.apparentTemperature | round(precision=1) }}&#176;C</td></tr>
+                    <tr><td>Relative Humidity</td><td>{{ conditions.currently.humidity | round(precision=2) }}{#&#37;#}</td></tr>
+                    <tr><td>Dew Point</td><td>{{ conditions.currently.dewPoint }}&#176;C</td></tr>
+                    <tr><td>Pressure</td><td>{{ conditions.currently.pressure }}hPa</td></tr>
+                    <tr><td>Wind Speed</td><td>{{ conditions.currently.windSpeed }}m/s</td></tr>
+                    <tr><td>Wind Direction</td><td>{{ conditions.currently.windBearing }}&#176;</td></tr>
+                    <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
+                    <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
+                    <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
+                    <tr><td>Status from</td><td>{{ convert_tz(datetime=conditions.currently.time, format="%Y-%m-%d %H:%M:%S") }}</td></tr>
+                </table>
+            </div>
+            <div id="tab-hourly">
+                <h2>Next Hours</h2>
+                <h3>{{ conditions.hourly.summary }}</h3>
+                <table>
+                    <tr>
+                        <th>Time</th>
+                        <th>Summary</th>
+                        <th>Temperature</th>
+                        <th>Pressure</th>
+                        <th>Wind</th>
+                        <th>Intensity</th>
+                        <th>Probability</th>
+                        <th>Cloud Cover</th>
+                        <th>Ozone</th>
+                    </tr>
+                {% for data in conditions.hourly.data %}
+                <tr>
+                    <td>{{ convert_tz(datetime=data.time, format="%H:%M") }}</td>
+                    <td>{{ data.summary }}</td>
+                    <td>{{ data.temperature | round(precision=1) }}&#176;C</td>
+                    <td>{{ data.pressure | round(precision=1) }} hPa</td>
+                    <td>{{ data.windSpeed | round(precision=1) }} m/s</td>
+                    <td>{{ data.precipIntensity | round(precision=3) }} mm/h</td>
+                    <td>{{ data.precipProbability | round(precision=3) }}</td>
+                    <td>{{ data.cloudCover | round(precision=3)}}</td>
+                    <td>{{ data.ozone }}</td>
+                </tr>
+                {% endfor %}
+                </table>
+            </div>
+            <div id="tab-daily">
+                <h2>Next days</h2>
+                <h3>{{ conditions.daily.summary }}</h3>
+                <table>
+                    <tr>
+                        <th>Time</th>
+                        <th>Summary</th>
+                        <th>Min Temp.</th>
+                        <th>Max Temp.</th>
+                        <th>Pressure</th>
+                        <th>Wind</th>
+                        <th>Intensity</th>
+                        <th>Probability</th>
+                        <th>Cloud Cover</th>
+                        <th>Ozone</th>
+                    </tr>
+                {% for data in conditions.daily.data %}
+                <tr>
+                    <td>{{ convert_tz(datetime=data.time, format="%a, %d.%m.") }}</td>
+                    <td>{{ data.summary }}</td>
+                    <td>{{ data.temperatureLow | round(precision=1) }}&#176;C</td>
+                    <td>{{ data.temperatureHigh | round(precision=1) }}&#176;C</td>
+                    <td>{{ data.pressure | round(precision=1) }} hPa</td>
+                    <td>{{ data.windSpeed | round(precision=1) }} m/s</td>
+                    <td>{{ data.precipIntensity | round(precision=3) }} mm/h</td>
+                    <td>{{ data.precipProbability | round(precision=3) }}</td>
+                    <td>{{ data.cloudCover | round(precision=3)}}</td>
+                    <td>{{ data.ozone }}</td>
+                </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
         {% endblock content %}

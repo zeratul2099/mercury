@@ -28,9 +28,15 @@ body
 #content_container
 		{
 		padding-bottom:3em;
-		font-size:130%;
+		/*font-size:130%;*/
             
 		}
+
+#content_container.tabs
+    {
+    font-size:80%;
+    }
+
 #footer
 		{
             border-top:2px outset #FF0000;
