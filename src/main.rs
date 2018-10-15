@@ -59,12 +59,13 @@ fn main() {
 }
 
 fn make_convert_tz(timezone: Tz) -> GlobalFn {
-    //datetime: DateTime<Utc>,  DateTime<chrono_tz::Tz> 
     Box::new(move |args| -> Result<Value, Error> {
         match args.get("datetime") {
             Some(val) => match from_value::<i64>(val.clone()) {
-                // TODO: clean up, handle missing format, possibly a "to_string" too much
-                Ok(v) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(&args.get("format").expect("no format given").as_str().unwrap()).to_string()).unwrap()),
+                Ok(v) => match args.get("format") {
+                    Some(f) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(f.as_str().unwrap()).to_string()).unwrap()),
+                    None => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).to_string()).unwrap())
+                }
                 Err(e) => Err(format!("oops error converting timezone: {}: {}", val, e).into()),
             },
             None => Err("oops no datetime given".into())
