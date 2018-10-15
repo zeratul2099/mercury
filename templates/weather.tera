@@ -53,7 +53,7 @@
                     </tr>
                 {% for data in conditions.hourly.data %}
                 <tr>
-                    <td>{{ convert_tz(datetime=data.time, format="%H:%M") }}</td>
+                    <td>{{ convert_tz(datetime=data.time, format="%a, %H:%M") }}</td>
                     <td>{{ data.summary }}</td>
                     <td>{{ data.temperature | round(precision=1) }}&#176;C</td>
                     <td>{{ data.pressure | round(precision=1) }} hPa</td>
