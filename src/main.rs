@@ -64,7 +64,7 @@ fn make_convert_tz(timezone: Tz) -> GlobalFn {
         match args.get("datetime") {
             Some(val) => match from_value::<i64>(val.clone()) {
                 // TODO: clean up, handle missing format, possibly a "to_string" too much
-                Ok(v) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(&args.get("format").expect("no format given").to_string()).to_string()).unwrap()),
+                Ok(v) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(&args.get("format").expect("no format given").as_str().unwrap()).to_string()).unwrap()),
                 Err(e) => Err(format!("oops error converting timezone: {}: {}", val, e).into()),
             },
             None => Err("oops no datetime given".into())
