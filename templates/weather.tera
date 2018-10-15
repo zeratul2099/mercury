@@ -1,11 +1,12 @@
 {% extends "base" %}
         {% block content %}
-        <h3>Current weather conditions</h3>
-        <h2>{{ conditions.currently.summary }}</h2>
+
+        <h2>Current weather conditions</h2>
+        <h3>{{ conditions.currently.summary }}</h3>
         <table>
             <tr><td>Temperature</td><td>{{ conditions.currently.temperature | round(precision=1) }}&#176;C</td></tr>
             <tr><td>Apparent Temperature</td><td>{{ conditions.currently.apparentTemperature | round(precision=1) }}&#176;C</td></tr>
-            <tr><td>Relative Humidity</td><td>{{ conditions.currently.humidity | round(precision=2) }}{#&#37#};</td></tr>
+            <tr><td>Relative Humidity</td><td>{{ conditions.currently.humidity | round(precision=2) }}{#&#37;#}</td></tr>
             <tr><td>Dew Point</td><td>{{ conditions.currently.dewPoint }}&#176;C</td></tr>
             <tr><td>Pressure</td><td>{{ conditions.currently.pressure }}hPa</td></tr>
             <tr><td>Wind Speed</td><td>{{ conditions.currently.windSpeed }}m/s</td></tr>
@@ -15,5 +16,22 @@
             <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
             <tr><td>Status from</td><td>{{ convert_tz(datetime=conditions.currently.time, format="%Y-%m-%d %H:%M:%S") }}</td></tr>
 
+        </table>
+        <h2>Next days</h2>
+        <h3>{{ conditions.daily.summary }}</h3>
+        <table>
+        {% for day_data in conditions.daily.data %}
+        <tr>
+            <td>{{ convert_tz(datetime=day_data.time, format="%Y-%m-%d") }}</td>
+            <td>{{ day_data.summary }}</td>
+            <td>{{ day_data.temperatureLow | round(precision=1) }}&#176;C</td>
+            <td>{{ day_data.temperatureHigh | round(precision=1) }}&#176;C</td>
+            <td>{{ day_data.windSpeed | round(precision=1) }} m/s</td>
+            <td>{{ day_data.pressure | round(precision=1) }} hPa</td>
+            <td>{{ day_data.cloudCover | round(precision=1)}}</td>
+            <td>{{ day_data.ozone }}</td>
+
+        </tr>
+        {% endfor %}
         </table>
         {% endblock content %}
