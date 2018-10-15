@@ -1,7 +1,7 @@
 #![allow(proc_macro_derive_resolution_fallback,dead_code)]
 #![feature(plugin, custom_derive,proc_macro_hygiene,decl_macro)]
 #[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
+extern crate rocket_contrib;
 extern crate itertools;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
@@ -26,11 +26,11 @@ use std::fs::File;
 use self::models::*;
 use rocket_contrib::json::Json;
 use rocket_contrib::templates::Template;
-use rocket::request::{Form,FromFormValue};
+use rocket::request::{Form};
 use rocket::response::NamedFile;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use tera::{{GlobalFn,Value,from_value,to_value}};
+use tera::{{GlobalFn,Value,from_value,to_value,Error}};
 use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
@@ -52,21 +52,22 @@ fn main() {
     rocket::ignite()
         .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges])
 //          .attach(Template::fairing())
-        .attach(Template::custom(|engines| {
-            engines.tera.register_function("convert_tz", make_convert_tz(&timezone));
+        .attach(Template::custom(move |engines| {
+            engines.tera.register_function("convert_tz", make_convert_tz(timezone));
         }))
         .launch();
 }
 
-fn make_convert_tz(timezone: &Tz) -> GlobalFn{
+fn make_convert_tz(timezone: Tz) -> GlobalFn {
     //datetime: DateTime<Utc>,  DateTime<chrono_tz::Tz> 
-    Box::new(move |args| -> Result<Value> {
+    Box::new(move |args| -> Result<Value, Error> {
         match args.get("datetime") {
-            Some(val) => match from_value::<DateTime<Utc>>(val.clone()) {
-                Ok(v) => Ok(to_value(&v.with_timezone(timezone)).unwrap()),
-                Err(_) => Err("oops".into()),
+            Some(val) => match from_value::<i64>(val.clone()) {
+                // TODO: clean up, handle missing format, possibly a "to_string" too much
+                Ok(v) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(&args.get("format").expect("no format given").to_string()).to_string()).unwrap()),
+                Err(e) => Err(format!("oops error converting timezone: {}: {}", val, e).into()),
             },
-            None => Err("oops".into())
+            None => Err("oops no datetime given".into())
         }
     })
 }
@@ -104,23 +105,16 @@ fn gauges() -> Template {
 #[derive(Deserialize, Serialize, Debug)]
 struct WeatherContext {
     conditions: WeatherData,
-    timestamp: String,
-    timezone_name: String,
 }
 
 #[get("/weather")]
 fn weather() -> Template {
-    let settings = get_settings();
     let mut file = File::open("weatherdump.json").unwrap();
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
     let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
-    let timezone: Tz = settings.timezone.parse().unwrap();
-    let ts = conditions.currently.time.with_timezone(&timezone).to_string();
     let context = WeatherContext {
         conditions: conditions,
-        timestamp: ts,
-        timezone_name: settings.timezone,
     };
     Template::render("weather", context)
 }

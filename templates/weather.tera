@@ -13,8 +13,7 @@
             <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
             <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
             <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
-            <tr><td>Status from</td><td>{{ timestamp }}</td></tr>
-            <tr><td>Status from</td><td>{{ convert_tz(conditions.currently.time, timezone_name)|date(format="%Y-%m-%d %H:%M") }}</td></tr>
+            <tr><td>Status from</td><td>{{ convert_tz(datetime=conditions.currently.time, format="%Y-%m-%d %H:%M:%S") }}</td></tr>
 
         </table>
         {% endblock content %}
