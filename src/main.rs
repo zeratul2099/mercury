@@ -13,6 +13,7 @@ extern crate diesel;
 extern crate chrono;
 extern crate chrono_tz;
 extern crate time;
+extern crate tera;
 
 pub mod common;
 pub mod schema;
@@ -24,10 +25,12 @@ use std::io::prelude::*;
 use std::fs::File;
 use self::models::*;
 use rocket_contrib::json::Json;
-use rocket::response::NamedFile;
 use rocket_contrib::templates::Template;
+use rocket::request::{Form,FromFormValue};
+use rocket::response::NamedFile;
 use chrono::prelude::*;
 use chrono_tz::Tz;
+use tera::{{GlobalFn,Value,from_value,to_value}};
 use common::{get_settings,check_notification,establish_connection,WeatherData};
 
 
@@ -44,13 +47,28 @@ struct PlotQuery {
 }
 
 fn main() {
+    let settings = get_settings();
+    let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
         .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges])
 //          .attach(Template::fairing())
         .attach(Template::custom(|engines| {
-            engines.tera.register_global_function("convert_tz", convert_tz);
+            engines.tera.register_function("convert_tz", make_convert_tz(&timezone));
         }))
         .launch();
+}
+
+fn make_convert_tz(timezone: &Tz) -> GlobalFn{
+    //datetime: DateTime<Utc>,  DateTime<chrono_tz::Tz> 
+    Box::new(move |args| -> Result<Value> {
+        match args.get("datetime") {
+            Some(val) => match from_value::<DateTime<Utc>>(val.clone()) {
+                Ok(v) => Ok(to_value(&v.with_timezone(timezone)).unwrap()),
+                Err(_) => Err("oops".into()),
+            },
+            None => Err("oops".into())
+        }
+    })
 }
 
 #[get("/simple")]
@@ -97,7 +115,8 @@ fn weather() -> Template {
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
     let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
-    let ts = convert_tz(conditions.currently.time, &settings.timezone).to_string();
+    let timezone: Tz = settings.timezone.parse().unwrap();
+    let ts = conditions.currently.time.with_timezone(&timezone).to_string();
     let context = WeatherContext {
         conditions: conditions,
         timestamp: ts,
@@ -106,20 +125,14 @@ fn weather() -> Template {
     Template::render("weather", context)
 }
 
-fn convert_tz(datetime: DateTime<Utc>, timezone: &String) -> DateTime<chrono_tz::Tz> {
-    let timezone: Tz = timezone.parse().unwrap();
-    let datetime = datetime.with_timezone(&timezone);
-    datetime
-}
-
-#[get("/api/send?<query>")]
-fn send(query: SendQuery) -> &'static str {
+#[get("/api/send?<query..>")]
+fn send(query: Form<SendQuery>) -> String {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     insert_values(&connection, &settings, &query.id, &query.t, &query.h);
     check_notification(&settings, query.id as i64, &"t".to_string(), query.t as f64);
     check_notification(&settings, query.id as i64, &"h".to_string(), query.h as f64);
-    "OK"
+    "OK".to_string()
 }
 
 #[get("/api/latest")]
