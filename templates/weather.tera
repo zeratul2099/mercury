@@ -31,8 +31,8 @@
                     <tr><td>Wind Speed</td><td>{{ conditions.currently.windSpeed }}m/s</td></tr>
                     <tr><td>Wind Direction</td><td>{{ conditions.currently.windBearing }}&#176;</td></tr>
                     <tr><td>Cloud Cover</td><td>{{ conditions.currently.cloudCover * 100 }}&#37;</td></tr>
-                    <tr><td>Precipitation</td><td>{{ conditions.currently.precipIntensity * 100 }}&#37;</td></tr>
-                    <tr><td>Probability</td><td>{{ conditions.currently.precipProbability * 100 }}&#37;</td></tr>
+                    <tr><td>Rain Intensity</td><td>{{ conditions.currently.precipIntensity | round(precision=3) }}mm/h</td></tr>
+                    <tr><td>Rain Probability</td><td>{{ conditions.currently.precipProbability | round(precision=3) }}</td></tr>
                     <tr><td>Status from</td><td>{{ convert_tz(datetime=conditions.currently.time, format="%Y-%m-%d %H:%M:%S") }}</td></tr>
                 </table>
             </div>
