@@ -29,8 +29,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    host_log,
-    sensor_log,
-    sensor_log2,
-);
+allow_tables_to_appear_in_same_query!(host_log, sensor_log, sensor_log2,);

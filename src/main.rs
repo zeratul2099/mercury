@@ -1,10 +1,13 @@
-#![allow(proc_macro_derive_resolution_fallback,dead_code)]
-#![feature(plugin, custom_derive,proc_macro_hygiene,decl_macro)]
-#[macro_use] extern crate rocket;
-extern crate rocket_contrib;
+#![allow(proc_macro_derive_resolution_fallback, dead_code)]
+#![feature(plugin, custom_derive, proc_macro_hygiene, decl_macro)]
+#[macro_use]
+extern crate rocket;
 extern crate itertools;
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate serde_derive;
+extern crate rocket_contrib;
+#[macro_use]
+extern crate lazy_static;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
@@ -12,27 +15,26 @@ extern crate serde_json;
 extern crate diesel;
 extern crate chrono;
 extern crate chrono_tz;
-extern crate time;
 extern crate tera;
+extern crate time;
 
 pub mod common;
-pub mod schema;
 pub mod models;
+pub mod schema;
 
-use std::collections::{HashMap};
-use std::path::{Path, PathBuf};
-use std::io::prelude::*;
-use std::fs::File;
 use self::models::*;
-use rocket_contrib::json::Json;
-use rocket_contrib::templates::Template;
-use rocket::request::{Form};
-use rocket::response::NamedFile;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use tera::{{GlobalFn,Value,from_value,to_value,Error}};
-use common::{get_settings,check_notification,establish_connection,WeatherData};
-
+use common::{check_notification, establish_connection, get_settings, WeatherData};
+use rocket::request::Form;
+use rocket::response::NamedFile;
+use rocket_contrib::json::Json;
+use rocket_contrib::templates::Template;
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::{Path, PathBuf};
+use tera::{from_value, to_value, Error, GlobalFn, Value};
 
 #[derive(FromForm)]
 struct SendQuery {
@@ -63,12 +65,19 @@ fn make_convert_tz(timezone: Tz) -> GlobalFn {
         match args.get("datetime") {
             Some(val) => match from_value::<i64>(val.clone()) {
                 Ok(v) => match args.get("format") {
-                    Some(f) => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).format(f.as_str().unwrap()).to_string()).unwrap()),
-                    None => Ok(to_value(Utc.timestamp(v, 0).with_timezone(&timezone).to_string()).unwrap())
-                }
+                    Some(f) => Ok(to_value(
+                        Utc.timestamp(v, 0)
+                            .with_timezone(&timezone)
+                            .format(f.as_str().unwrap())
+                            .to_string(),
+                    ).unwrap()),
+                    None => Ok(
+                        to_value(Utc.timestamp(v, 0).with_timezone(&timezone).to_string()).unwrap(),
+                    ),
+                },
                 Err(e) => Err(format!("oops error converting timezone: {}: {}", val, e).into()),
             },
-            None => Err("oops no datetime given".into())
+            None => Err("oops no datetime given".into()),
         }
     })
 }
