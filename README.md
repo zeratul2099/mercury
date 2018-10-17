@@ -1,4 +1,7 @@
 # mercury
+
+[![Build Status](https://travis-ci.com/zeratul2099/mercury.svg?branch=master)](https://travis-ci.com/zeratul2099/mercury)
+
 A (partial) rust port of Home Sensor Network 
 
 Uses diesel, rocket, reqwest, yaml-rust and rust nightly. Currently provides only the API for the sensors.
