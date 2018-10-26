@@ -1,12 +1,44 @@
 {% extends "base" %}
     {% block head %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha256-rByPlHULObEjJ6XQxW/flG2r+22R5dKiAoef+aXWfik=" crossorigin="anonymous" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.3/css/glide.core.min.css" integrity="sha256-Ev8y2mML/gGa4LFVZgNpMTjKwj34q4pC4DcseWeRb9w=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.3/glide.min.js" integrity="sha256-94n4/mre23wpSs9BrG/VAtLb2tK9wtBP0GYry6zmYl4=" crossorigin="anonymous"></script>
     {% endblock head %}
     {% block bodyscript %}
     <script type='text/javascript'>
         $(document).ready(function () {
+            var glide_h = new Glide('.glide_h', {
+                type: 'slider',
+                perView: 8,
+                startAt: 0,
+                focusAt: 0,
+                rewind: false,
+                breakpoints: {
+                    1680: {perView: 6},
+                    1080: {perView: 4},
+                    800: {perView: 3},
+                    600: {perView: 2},
+                    400: {perView: 1},
+                }
+            });
+            glide_h.mount();
+            var glide_d = new Glide('.glide_d', {
+                type: 'slider',
+                perView: 7,
+                startAt: 0,
+                focusAt: 0,
+                rewind: false,
+                breakpoints: {
+                    1680: {perView: 6},
+                    1080: {perView: 4},
+                    800: {perView: 3},
+                    600: {perView: 2},
+                    400: {perView: 1},
+                }
+            });
+            glide_d.mount();
             $( "#tabs" ).tabs();
         })
     </script>
@@ -39,8 +71,29 @@
             <div id="tab-hourly">
                 <h2>Next Hours</h2>
                 <h3>{{ conditions.hourly.summary }}</h3>
-                <table>
-                    <tr>
+                <div class="glide_h">
+                    <div class=glide__track" data-glide-el="track">
+                        <ul class="glide__slides">
+                            {% for data in conditions.hourly.data %}
+                            <li class="glide__slide">
+                                <div style="border-width: 1px; border-style: solid; text-align: center; padding: 5px;">
+                                    <div>{{ convert_tz(datetime=data.time, format="%a, %H:%M") }}</div>
+                                    <div>{{ data.summary }}</div>
+                                    <div><img src="/static/weather_icons/{{ data.icon }}.svg" alt="{{ data.icon }}" /></div>
+                                    <div><h2>{{ data.temperature | round(precision=1) }}°C</h2></div>
+                                    <div><span>{{ data.windSpeed | round(precision=1) }}m/s</span> <span>{{ data.precipProbability | round(precision=3) }}</span></div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="glide__arrows" data-glide-el="controls">
+                        <input type="button" class="glide__arrow glide__arrow--left button" data-glide-dir="<" style="display: flex; justify-content: center;" value="prev"</>
+                        <input type="button" class="glide__arrow glide__arrow--right button" data-glide-dir=">" style="display: flex; justify-content: center;" value="next"</>
+                    </div>
+                </div>
+                <div><table>
+                    <tr class="tablehdr">
                         <th>Time</th>
                         <th>Summary</th>
                         <th>Temperature</th>
@@ -49,10 +102,9 @@
                         <th>Intensity</th>
                         <th>Probability</th>
                         <th>Cloud Cover</th>
-                        <th>Ozone</th>
                     </tr>
                 {% for data in conditions.hourly.data %}
-                <tr>
+                <tr class="evenodd">
                     <td>{{ convert_tz(datetime=data.time, format="%a, %H:%M") }}</td>
                     <td>{{ data.summary }}</td>
                     <td>{{ data.temperature | round(precision=1) }}&#176;C</td>
@@ -61,16 +113,37 @@
                     <td>{{ data.precipIntensity | round(precision=3) }} mm/h</td>
                     <td>{{ data.precipProbability | round(precision=3) }}</td>
                     <td>{{ data.cloudCover | round(precision=3)}}</td>
-                    <td>{{ data.ozone }}</td>
                 </tr>
                 {% endfor %}
-                </table>
+                </table></div>
             </div>
             <div id="tab-daily">
                 <h2>Next days</h2>
                 <h3>{{ conditions.daily.summary }}</h3>
+                <div class="glide_d">
+                    <div class=glide__track" data-glide-el="track">
+                        <ul class="glide__slides">
+                            {% for data in conditions.daily.data %}
+                            <li class="glide__slide">
+                                <div style="border-width: 1px; border-style: solid; text-align: center; padding: 5px;">
+                                    <div>{{ convert_tz(datetime=data.time, format="%a, %d.%m.") }}</div>
+                                    <div>{{ data.summary }}</div>
+                                    <div><img src="/static/weather_icons/{{ data.icon }}.svg" alt="{{ data.icon }}" /></div>
+                                    <div><h2>{{ data.temperatureLow | round(precision=1) }}°C</h2></div>
+                                    <div><h2>{{ data.temperatureHigh | round(precision=1) }}°C</h2></div>
+                                    <div><span>{{ data.windSpeed | round(precision=1) }}m/s</span> <span>{{ data.precipProbability | round(precision=3) }}</span></div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="glide__arrows" data-glide-el="controls">
+                        <input type="button" class="glide__arrow glide__arrow--left button" data-glide-dir="<" style="display: flex; justify-content: center;" value="prev"</>
+                        <input type="button" class="glide__arrow glide__arrow--right button" data-glide-dir=">" style="display: flex; justify-content: center;" value="next"</>
+                    </div>
+                </div>
                 <table>
-                    <tr>
+                    <tr class="tablehdr">
                         <th>Time</th>
                         <th>Summary</th>
                         <th>Min Temp.</th>
@@ -80,10 +153,9 @@
                         <th>Intensity</th>
                         <th>Probability</th>
                         <th>Cloud Cover</th>
-                        <th>Ozone</th>
                     </tr>
                 {% for data in conditions.daily.data %}
-                <tr>
+                <tr class="evenodd">
                     <td>{{ convert_tz(datetime=data.time, format="%a, %d.%m.") }}</td>
                     <td>{{ data.summary }}</td>
                     <td>{{ data.temperatureLow | round(precision=1) }}&#176;C</td>
@@ -93,7 +165,6 @@
                     <td>{{ data.precipIntensity | round(precision=3) }} mm/h</td>
                     <td>{{ data.precipProbability | round(precision=3) }}</td>
                     <td>{{ data.cloudCover | round(precision=3)}}</td>
-                    <td>{{ data.ozone }}</td>
                 </tr>
                 {% endfor %}
                 </table>

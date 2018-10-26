@@ -10,10 +10,14 @@ For the full webinterface see: https://github.com/zeratul2099/home_sensor_networ
 Home Sensor Network / Mercury provides a database backend for self-made Arduino/ESP32-based Sensor Units for temperature
 and air humidity surveillance and storing. The ESP32-code and circuit-diagram will will follow later here.
 
+
+Breeze icon theme copyright GNU LESSER GENERAL PUBLIC LICENSE
+
+https://github.com/KDE/breeze-icons
+
+
+
 TODO: port all hsn-features
-    - webgui with templates (tera as jinja2-replacement)
-    - plots with plotly.js
     - wouldbe-values
     - daily mean
-    - weather forecast + icons
     - serial-receiver for old arduino sensors
