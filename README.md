@@ -17,7 +17,8 @@ https://github.com/KDE/breeze-icons
 
 
 
-TODO: port all hsn-features
-    - wouldbe-values
-    - daily mean
-    - serial-receiver for old arduino sensors
+TODO:
+    -port all hsn-features
+        - daily mean
+        - serial-receiver for old arduino sensors
+    - add sensor sketch
