@@ -37,7 +37,10 @@ pub fn get_latest_values(
     for s_id in sorted(settings.sensor_map.keys()) {
         let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
         let result = sensor_log
-            .filter(sensor_id.eq(s_id))
+            .filter(
+                sensor_id.eq(s_id)
+                .and(temperature.is_not_null())
+                )
             .order(timestamp.desc())
             .limit(1)
             .load::<Log>(connection)
@@ -58,8 +61,8 @@ pub fn get_latest_values(
                 log.sensor_id.to_string(),
                 log.sensor_name.unwrap(),
                 ts,
-                log.temperature.unwrap(),
-                log.humidity.unwrap(),
+                log.temperature.expect("Invalid value for temperature"),
+                log.humidity.expect("Unvalid value for humidity"),
                 too_old,
             ))
         }
