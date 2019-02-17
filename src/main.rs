@@ -1,5 +1,5 @@
 #![allow(proc_macro_derive_resolution_fallback, dead_code)]
-#![feature(plugin, custom_derive, proc_macro_hygiene, decl_macro)]
+#![feature(plugin, proc_macro_hygiene, decl_macro)]
 #[macro_use]
 extern crate rocket;
 extern crate itertools;
