@@ -1,6 +1,6 @@
 {% extends "base" %}
         {% block content %}
         {% for value in latest_values %}
-            <div {% if value.5 %}class='red'{% endif %} ><h3><a href='/{{ value.0 }}?page=0'>{{ value.1 }}</a></h3><h4>{{ value.2 }}:</h4><span>{{ value.3 | round(precision=2) }}&#176;C, {{ value.4 | round(precision=2) }}&#37;</span></div>
+            <div {% if value.5 %}class='red'{% endif %} ><h3><a href='/table/{{ value.0 }}?page=0'>{{ value.1 }}</a></h3><h4>{{ value.2 }}:</h4><span>{{ value.3 | round(precision=2) }}&#176;C, {{ value.4 | round(precision=2) }}&#37;</span></div>
         {% endfor %}
         {% endblock content %}

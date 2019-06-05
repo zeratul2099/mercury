@@ -1,0 +1,18 @@
+{% extends "base" %}
+        {% block content %}
+        <h3>Table</h3>
+            <table>
+                <tr class='tablehdr'>
+                    <th>SensorId</th><th>Location</th><th>Timestamp</th><th>Temperature</th><th>Humidity</th>
+                </tr>
+            {% for entry in result %}
+                <tr>
+                    <td><a href='table/{{ entry.0 }}?page=0'>{{ entry.0 }}</a></td>
+                    <td><a href='table/{{ entry.0 }}?page=0'>{{ entry.1 }}</a></td>
+                    <td>{{ entry.2 }}</td>
+                    <td>{{ entry.3 | round(precision=2) }}</td>
+                    <td>{{ entry.4 | round(precision=2) }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        {% endblock %}

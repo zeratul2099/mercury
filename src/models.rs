@@ -29,6 +29,8 @@ pub struct NewLog<'a> {
 pub fn get_latest_values(
     connection: &MysqlConnection,
     settings: &Settings,
+    limit: i64,
+    filter_sensor_id: Option<i32>,
 ) -> Vec<(String, String, String, f32, f32, bool)> {
     use super::schema::sensor_log::dsl::*;
     let mut latest_values: Vec<(String, String, String, f32, f32, bool)> = Vec::new();
@@ -36,13 +38,19 @@ pub fn get_latest_values(
     let tz: Tz = settings.timezone.parse().unwrap();
     for s_id in sorted(settings.sensor_map.keys()) {
         let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
+        match filter_sensor_id {
+            None => (),
+            Some(fs_id) => if fs_id != s_id {
+                continue;
+            }
+        };
         let result = sensor_log
             .filter(
                 sensor_id.eq(s_id)
                 .and(temperature.is_not_null())
                 )
             .order(timestamp.desc())
-            .limit(1)
+            .limit(limit)
             .load::<Log>(connection)
             .expect("Error loading sensor logs");
         for log in result {

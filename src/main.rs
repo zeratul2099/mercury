@@ -52,7 +52,7 @@ fn main() {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges])
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table])
 //          .attach(Template::fairing())
         .attach(Template::custom(move |engines| {
             engines.tera.register_function("convert_tz", make_convert_tz(timezone));
@@ -87,7 +87,7 @@ fn simple() -> Template {
     let mut context = HashMap::new();
     let settings = get_settings();
     let connection = establish_connection(&settings);
-    let values = get_latest_values(&connection, &settings);
+    let values = get_latest_values(&connection, &settings, 1, None);
     context.insert("latest_values".to_string(), values);
     Template::render("simple", context)
 }
@@ -129,6 +129,21 @@ fn weather() -> Template {
     Template::render("weather", context)
 }
 
+#[get("/table")]
+fn table() -> Template {
+    render_table(None)
+}
+
+#[get("/table/<s_id>")]
+fn render_table(s_id: Option<i32>) -> Template {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_latest_values(&connection, &settings, 100, s_id);
+    let mut context = HashMap::new();
+    context.insert("result".to_string(), values);
+    Template::render("table", context)
+}
+
 #[get("/api/send?<query..>")]
 fn send(query: Form<SendQuery>) -> String {
     let settings = get_settings();
@@ -143,7 +158,7 @@ fn send(query: Form<SendQuery>) -> String {
 fn latest() -> Json<Vec<(String, String, String, f32, f32, bool)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
-    let values = get_latest_values(&connection, &settings);
+    let values = get_latest_values(&connection, &settings, 1, None);
     Json(values)
 }
 
