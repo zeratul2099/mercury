@@ -121,7 +121,6 @@ pub fn insert_values<'a>(
     temperature: &'a f32,
     humidity: &'a f32,
 ) {
-    use schema::sensor_log;
     let new_log = NewLog {
         sensor_id: sensor_id,
         sensor_name: &settings.sensor_map[&sensor_id.to_string()],
