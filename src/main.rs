@@ -162,11 +162,11 @@ fn latest() -> Json<Vec<(String, String, String, f32, f32, bool)>> {
     Json(values)
 }
 
-#[get("/api/history")]
-fn history() -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
+#[get("/api/history/<days>")]
+fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
-    let values = get_history(&connection, &settings);
+    let values = get_history(&connection, &settings, days);
     Json(values)
 }
 

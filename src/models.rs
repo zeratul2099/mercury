@@ -81,9 +81,10 @@ pub fn get_latest_values(
 pub fn get_history(
     connection: &MysqlConnection,
     settings: &Settings,
+    days: i64,
 ) -> Vec<(i32, String, Vec<(String, f32, f32)>)> {
     use super::schema::sensor_log::dsl::*;
-    let begin = Utc::now().naive_utc() - Duration::days(1);
+    let begin = Utc::now().naive_utc() - Duration::days(days);
     let tz: Tz = settings.timezone.parse().unwrap();
     let mut history = Vec::new();
     for (s_id, s_name) in sorted(&settings.sensor_map) {
