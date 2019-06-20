@@ -134,3 +134,36 @@ pub fn insert_values<'a>(
         .execute(connection)
         .expect("Error saving new values");
 }
+
+pub fn get_day_mean_values(
+    connection: &MysqlConnection,
+    s_id: &i32,
+//    day: NaiveDate,
+) -> (f32, f32) {
+    use super::schema::sensor_log::dsl::*;
+    //let end = day - Duration::days(1);
+    //let begin = day;
+    let begin = Utc::now().naive_utc() - Duration::days(1);
+    let end = Utc::now().naive_utc();
+    let result = sensor_log
+        .filter(sensor_id.eq(s_id))
+        .filter(timestamp.gt(begin))
+        .filter(timestamp.lt(end))
+        .order_by(timestamp.asc())
+        .load::<Log>(connection)
+        .expect("Error loading sensor logs");
+    let mut t_sum: f32 = 0.0;
+    let mut h_sum: f32 = 0.0;
+    let mut t_len: f32 = 0.0;
+    let mut h_len: f32 = 0.0;
+
+    for log in result {
+        t_sum += log.temperature.unwrap();
+        h_sum += log.humidity.unwrap();
+        t_len += 1.0;
+        h_len += 1.0;
+    }
+    let t_mean: f32 = t_sum / t_len;
+    let h_mean: f32 = h_sum / h_len;
+    (t_mean, h_mean)
+}

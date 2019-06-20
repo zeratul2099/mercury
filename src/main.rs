@@ -52,7 +52,7 @@ fn main() {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table])
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table,mean])
 //          .attach(Template::fairing())
         .attach(Template::custom(move |engines| {
             engines.tera.register_function("convert_tz", make_convert_tz(timezone));
@@ -167,6 +167,14 @@ fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let values = get_history(&connection, &settings, days);
+    Json(values)
+}
+
+#[get("/api/mean/<s_id>")]
+fn mean(s_id: i32) -> Json<(f32, f32)> {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_day_mean_values(&connection, &s_id);
     Json(values)
 }
 
