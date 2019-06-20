@@ -138,16 +138,13 @@ pub fn insert_values<'a>(
 pub fn get_day_mean_values(
     connection: &MysqlConnection,
     s_id: &i32,
-//    day: NaiveDate,
+    date: NaiveDateTime,
 ) -> (f32, f32) {
     use super::schema::sensor_log::dsl::*;
-    //let end = day - Duration::days(1);
-    //let begin = day;
-    let begin = Utc::now().naive_utc() - Duration::days(1);
-    let end = Utc::now().naive_utc();
+    let end = date + Duration::days(1);
     let result = sensor_log
         .filter(sensor_id.eq(s_id))
-        .filter(timestamp.gt(begin))
+        .filter(timestamp.gt(date))
         .filter(timestamp.lt(end))
         .order_by(timestamp.asc())
         .load::<Log>(connection)

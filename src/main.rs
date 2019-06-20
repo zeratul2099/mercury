@@ -170,11 +170,13 @@ fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     Json(values)
 }
 
-#[get("/api/mean/<s_id>")]
-fn mean(s_id: i32) -> Json<(f32, f32)> {
+#[get("/api/mean/<s_id>/<date>")]
+fn mean(s_id: i32, date: String) -> Json<(f32, f32)> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
-    let values = get_day_mean_values(&connection, &s_id);
+    let date = format!("{}T00:00:00Z", date);
+    let date = DateTime::parse_from_rfc3339(&date).unwrap().naive_utc();
+    let values = get_day_mean_values(&connection, &s_id, date);
     Json(values)
 }
 
