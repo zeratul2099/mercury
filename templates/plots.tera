@@ -53,6 +53,15 @@ $(document).ready(function () {
         var args = {type: 'GET', url: '../api/history/1', success: history_callback()}
         $.ajax(args)
     }
+    call_mean = function() {
+        var now = new Date()
+        var then = new Date(now - 14 * 24 * 3600 * 1000)
+        now = now.toISOString().split("T")[0]
+        then = then.toISOString().split("T")[0]
+        var args = {type: 'GET', url: '../api/mean/' + then + '/' + now, success: history_callback()}
+        $.ajax(args)
+    }
+
 
     call_update()
 
@@ -63,9 +72,11 @@ $(document).ready(function () {
 	{% endblock bodyscript %}
 	{% block content %}
         <h3>Plots</h3>
-        <input type='submit' id='update_button' value='update' class='jsbtn' />
+        <input type='submit' id='update_button' value='last 24h' class='jsbtn' />
+        <input type='submit' id='mean_button' value='daily mean' class='jsbtn' />
         <script>
         $('#update_button').click(function() { call_update() })
+        $('#mean_button').click(function() { call_mean() })
         </script>
             <hr>
 			<div id='chart_t'></div>

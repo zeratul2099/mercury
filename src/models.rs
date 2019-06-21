@@ -164,3 +164,24 @@ pub fn get_day_mean_values(
     let h_mean: f32 = h_sum / h_len;
     (t_mean, h_mean)
 }
+
+pub fn get_timespan_mean_values(
+    connection: &MysqlConnection,
+    settings: &Settings,
+    begin: NaiveDateTime,
+    end: NaiveDateTime,
+) -> Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)> {
+    let mut result: Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)> = Vec::new();
+    for (s_id, s_name) in sorted(&settings.sensor_map) {
+        let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
+        let mut current = begin;
+        let mut s_values: Vec<(NaiveDateTime, f32, f32)> = Vec::new();
+        while current < end {
+            let (t_mean, h_mean) = get_day_mean_values(&connection, &s_id, current);
+            s_values.push((current, t_mean, h_mean));
+            current += Duration::days(1);
+        }
+        result.push((s_id, s_name.to_string(), s_values));
+    }
+    result
+}

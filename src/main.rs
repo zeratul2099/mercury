@@ -52,7 +52,7 @@ fn main() {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table,mean])
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table,mean,single_mean])
 //          .attach(Template::fairing())
         .attach(Template::custom(move |engines| {
             engines.tera.register_function("convert_tz", make_convert_tz(timezone));
@@ -170,13 +170,25 @@ fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
     Json(values)
 }
 
-#[get("/api/mean/<s_id>/<date>")]
-fn mean(s_id: i32, date: String) -> Json<(f32, f32)> {
+#[get("/api/single_mean/<s_id>/<date>")]
+fn single_mean(s_id: i32, date: String) -> Json<(f32, f32)> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let date = format!("{}T00:00:00Z", date);
     let date = DateTime::parse_from_rfc3339(&date).unwrap().naive_utc();
     let values = get_day_mean_values(&connection, &s_id, date);
+    Json(values)
+}
+
+#[get("/api/mean/<begin>/<end>")]
+fn mean(begin: String, end: String) -> Json<Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)>> {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let begin = format!("{}T00:00:00Z", begin);
+    let begin = DateTime::parse_from_rfc3339(&begin).unwrap().naive_utc();
+    let end = format!("{}T00:00:00Z", end);
+    let end = DateTime::parse_from_rfc3339(&end).unwrap().naive_utc();
+    let values = get_timespan_mean_values(&connection, &settings, begin, end);
     Json(values)
 }
 
