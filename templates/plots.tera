@@ -55,7 +55,7 @@ $(document).ready(function () {
     }
     call_mean = function() {
         var now = new Date()
-        var then = new Date(now - 14 * 24 * 3600 * 1000)
+        var then = new Date(now - 21 * 24 * 3600 * 1000)
         now = now.toISOString().split("T")[0]
         then = then.toISOString().split("T")[0]
         var args = {type: 'GET', url: '../api/mean/' + then + '/' + now, success: history_callback()}
