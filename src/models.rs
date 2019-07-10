@@ -135,11 +135,11 @@ pub fn insert_values<'a>(
         .expect("Error saving new values");
 }
 
-pub fn get_day_mean_values(
+pub fn get_day_mean_min_max_values(
     connection: &MysqlConnection,
     s_id: &i32,
     date: NaiveDateTime,
-) -> (f32, f32) {
+) -> (f32, f32, f32, f32, f32, f32) {
     use super::schema::sensor_log::dsl::*;
     let end = date + Duration::days(1);
     let result = sensor_log
@@ -151,34 +151,52 @@ pub fn get_day_mean_values(
         .expect("Error loading sensor logs");
     let mut t_sum: f32 = 0.0;
     let mut h_sum: f32 = 0.0;
+    let mut t_min: f32 = 1000.0;
+    let mut h_min: f32 = 100.0;
+    let mut t_max: f32 = -273.15;
+    let mut h_max: f32 = 0.0;
     let mut t_len: f32 = 0.0;
     let mut h_len: f32 = 0.0;
 
     for log in result {
-        t_sum += log.temperature.unwrap();
-        h_sum += log.humidity.unwrap();
+        let t = log.temperature.unwrap();
+        let h = log.humidity.unwrap();
+        if t > t_max {
+            t_max = t;
+        }
+        if h > h_max {
+            h_max = h;
+        }
+        if t < t_min {
+            t_min = t;
+        }
+        if h < h_min {
+            h_min = h;
+        }
+        t_sum += t;
+        h_sum += h;
         t_len += 1.0;
         h_len += 1.0;
     }
     let t_mean: f32 = t_sum / t_len;
     let h_mean: f32 = h_sum / h_len;
-    (t_mean, h_mean)
+    (t_mean, h_mean, t_min, h_min, t_max, h_max)
 }
 
-pub fn get_timespan_mean_values(
+pub fn get_timespan_mean_min_max_values(
     connection: &MysqlConnection,
     settings: &Settings,
     begin: NaiveDateTime,
     end: NaiveDateTime,
-) -> Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)> {
-    let mut result: Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)> = Vec::new();
+) -> Vec<(i32, String, Vec<(NaiveDateTime, f32, f32, f32, f32, f32, f32)>)> {
+    let mut result: Vec<(i32, String, Vec<(NaiveDateTime, f32, f32, f32, f32, f32, f32)>)> = Vec::new();
     for (s_id, s_name) in sorted(&settings.sensor_map) {
         let s_id: i32 = s_id.parse().expect("Cannot parse s_id");
         let mut current = begin;
-        let mut s_values: Vec<(NaiveDateTime, f32, f32)> = Vec::new();
+        let mut s_values: Vec<(NaiveDateTime, f32, f32, f32, f32, f32, f32)> = Vec::new();
         while current < end {
-            let (t_mean, h_mean) = get_day_mean_values(&connection, &s_id, current);
-            s_values.push((current, t_mean, h_mean));
+            let (t_mean, h_mean, t_min, h_min, t_max, h_max) = get_day_mean_min_max_values(&connection, &s_id, current);
+            s_values.push((current, t_mean, h_mean, t_min, h_min, t_max, h_max));
             current += Duration::days(1);
         }
         result.push((s_id, s_name.to_string(), s_values));

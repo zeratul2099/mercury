@@ -171,24 +171,24 @@ fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
 }
 
 #[get("/api/single_mean/<s_id>/<date>")]
-fn single_mean(s_id: i32, date: String) -> Json<(f32, f32)> {
+fn single_mean(s_id: i32, date: String) -> Json<(f32, f32, f32, f32, f32, f32)> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let date = format!("{}T00:00:00Z", date);
     let date = DateTime::parse_from_rfc3339(&date).unwrap().naive_utc();
-    let values = get_day_mean_values(&connection, &s_id, date);
+    let values = get_day_mean_min_max_values(&connection, &s_id, date);
     Json(values)
 }
 
 #[get("/api/mean/<begin>/<end>")]
-fn mean(begin: String, end: String) -> Json<Vec<(i32, String, Vec<(NaiveDateTime, f32, f32)>)>> {
+fn mean(begin: String, end: String) -> Json<Vec<(i32, String, Vec<(NaiveDateTime, f32, f32, f32, f32, f32, f32)>)>> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let begin = format!("{}T00:00:00Z", begin);
     let begin = DateTime::parse_from_rfc3339(&begin).unwrap().naive_utc();
     let end = format!("{}T00:00:00Z", end);
     let end = DateTime::parse_from_rfc3339(&end).unwrap().naive_utc();
-    let values = get_timespan_mean_values(&connection, &settings, begin, end);
+    let values = get_timespan_mean_min_max_values(&connection, &settings, begin, end);
     Json(values)
 }
 

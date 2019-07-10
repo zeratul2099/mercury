@@ -14,20 +14,55 @@ $(document).ready(function () {
             var plotname = "Relative Humidity"
         }
         $.each(data, function(idx, sensor_data) {
-            pltrace = {
-                type: 'scatter',
-                mode: 'lines',
-                name: sensor_data[1],
-                x: sensor_data[2].map(x => x[0].slice(0, -3)),
-            }
-            if (plot_id == "chart_t") {
-                pltrace.y = sensor_data[2].map(x => x[1])
+            if (idx == 0 && sensor_data[2][0].length > 3) {
+                pltrace_min = {
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        dash: 'dashdot',
+                        color: 'rgb(31, 119, 180)',
+                    },
+                    name: sensor_data[1] + ' Min',
+                    x: sensor_data[2].map(x => x[0].slice(0, -3)),
+                }
+                pltrace_max = {
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        dash: 'dashdot',
+                        color: 'rgb(180, 31, 31)',
+                    },
+                    name: sensor_data[1] + ' Max',
+                    x: sensor_data[2].map(x => x[0].slice(0, -3)),
+                }
+                if (plot_id == "chart_t") {
+                    pltrace_min.y = sensor_data[2].map(x => x[3])
+                    pltrace_max.y = sensor_data[2].map(x => x[5])
+                } else {
+                    pltrace_min.y = sensor_data[2].map(x => x[4])
+                    pltrace_max.y = sensor_data[2].map(x => x[6])
+                }
                 shapes = []
+                pldata.push(pltrace_min)
+                pldata.push(pltrace_max)
+                
+
             } else {
-                pltrace.y = sensor_data[2].map(x => x[2])
-                shapes = []
+                pltrace = {
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: sensor_data[1],
+                    x: sensor_data[2].map(x => x[0].slice(0, -3)),
+                }
+                if (plot_id == "chart_t") {
+                    pltrace.y = sensor_data[2].map(x => x[1])
+                    shapes = []
+                } else {
+                    pltrace.y = sensor_data[2].map(x => x[2])
+                    shapes = []
+                }
+                pldata.push(pltrace)
             }
-            pldata.push(pltrace)
         })
         layout = {
             title: plotname,
