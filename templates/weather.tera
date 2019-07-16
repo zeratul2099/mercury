@@ -129,8 +129,8 @@
                                     <div>{{ convert_tz(datetime=data.time, format="%a, %d.%m.") }}</div>
                                     <div>{{ data.summary }}</div>
                                     <div><img src="/static/weather_icons/{{ data.icon }}.svg" alt="{{ data.icon }}" /></div>
-                                    <div><h2>{{ data.temperatureLow | round(precision=1) }}°C</h2></div>
                                     <div><h2>{{ data.temperatureHigh | round(precision=1) }}°C</h2></div>
+                                    <div><h2>{{ data.temperatureLow | round(precision=1) }}°C</h2></div>
                                     <div><span>{{ data.windSpeed | round(precision=1) }}m/s</span> <span>{{ data.precipProbability | round(precision=3) }}</span></div>
                                 </div>
                             </li>
