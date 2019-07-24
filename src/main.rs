@@ -148,7 +148,20 @@ fn render_table(s_id: Option<i32>) -> Template {
 fn send(query: Form<SendQuery>) -> String {
     let settings = get_settings();
     let connection = establish_connection(&settings);
-    insert_values(&connection, &settings, &query.id, &query.t, &query.h);
+    // HACK to fix decimal formatting errors of arduino implementation
+    let temp: f32;
+    let hum: f32;
+    if query.t * 100.0 % 10.0 == 9.0 {
+        temp = (query.t * 10.0).round() / 10.0;
+    } else {
+        temp = query.t;
+    }
+    if query.h * 100.0 % 10.0 == 9.0 {
+        hum = (query.h * 10.0).round() / 10.0;
+    } else {
+        hum = query.h;
+    }
+    insert_values(&connection, &settings, &query.id, &temp, &hum);
     check_notification(&settings, query.id as i64, &"t".to_string(), query.t as f64);
     check_notification(&settings, query.id as i64, &"h".to_string(), query.h as f64);
     "OK".to_string()
