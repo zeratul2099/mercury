@@ -53,7 +53,7 @@
             </ul>
             <div id="tab-currently">
                 <h2>Current weather conditions</h2>
-                <h3>{{ conditions.currently.summary }}</h3>
+                <h3><div><img src="/static/weather_icons/{{ conditions.currently.icon }}.svg" alt="{{ conditions.currently.summary }}" /></div>{{ conditions.currently.summary }}</h3>
                 <table>
                     <tr><td>Temperature</td><td>{{ conditions.currently.temperature | round(precision=1) }}&#176;C</td></tr>
                     <tr><td>Apparent Temperature</td><td>{{ conditions.currently.apparentTemperature | round(precision=1) }}&#176;C</td></tr>
