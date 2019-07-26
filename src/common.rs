@@ -200,7 +200,6 @@ pub fn check_notification(settings: &Settings, sensor: i64, vtype: &String, valu
                     );
                     println!("{}", msg);
                     send_pushover_message(&settings, msg);
-                    println!("{}: {}, {}, {}, {}", idx, csensor, ctype, cvalue, cmp);
                     NOTIFIED.lock().unwrap().insert(idx);
                 }
             } else if (cmp.eq("+") && value < cvalue - 0.5) || (cmp == "-" && value > cvalue + 0.5)
@@ -220,4 +219,5 @@ pub fn check_notification(settings: &Settings, sensor: i64, vtype: &String, valu
             }
         }
     }
+    println!("Notified rules: {:?}", NOTIFIED.lock().unwrap());
 }
