@@ -5,7 +5,7 @@ use common::Settings;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use itertools::sorted;
-use time::Duration;
+use chrono::Duration;
 
 #[derive(Queryable)]
 pub struct Log {

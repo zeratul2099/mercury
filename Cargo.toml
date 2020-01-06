@@ -13,9 +13,9 @@ rocket = "0.4.0"
 rocket_contrib = {version = "0.4.0", features = ["tera_templates"]}
 itertools = "*"
 lazy_static = "1.1.0"
-reqwest = "*"
+reqwest = "0.9.*" # TODO: upgrade to 0.10
 serde = "1.0.*"
 serde_json = "1.0.*"
 serde_derive = "1.0.*"
 time = "*"
-tera = "*"
+tera = "0.*" # TODO: upgrade to 1.0
