@@ -1,6 +1,6 @@
 # mercury
 
-[![Build Status](https://travis-ci.com/zeratul2099/mercury.svg?branch=master)](https://travis-ci.com/zeratul2099/mercury)
+[![Build Status](https://travis-ci.com/zeratul2099/mercury.svg?branch=master)](https://travis-ci.com/zeratul2099/mercury) ![Rust](https://github.com/zeratul2099/mercury/workflows/Rust/badge.svg?branch=master)
 
 A (partial) rust port of Home Sensor Network 
 
