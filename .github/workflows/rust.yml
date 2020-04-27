@@ -10,7 +10,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        rust:
+          - nightly
     steps:
     - uses: actions/checkout@v2
     - name: Build
