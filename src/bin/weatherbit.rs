@@ -23,7 +23,7 @@ mod models;
 #[path = "../schema.rs"]
 mod schema;
 
-//use self::models::insert_values;
+use self::models::insert_values;
 use common::{establish_connection, get_settings};
 use weatherbit_model::WeatherbitCurrent;
 use std::fs::File;
@@ -46,12 +46,12 @@ fn main() {
     println!("{}", serde_json::to_string_pretty(&content).unwrap());
     let file = File::create("weatherbitdump.json").unwrap();
     serde_json::to_writer_pretty(&file, &content).unwrap();
-    /*let connection = establish_connection(&settings);
+    let connection = establish_connection(&settings);
     insert_values(
         &connection,
         &settings,
         &0,
-        &content.currently.temperature,
-        &(content.currently.humidity * 100.0),
-    );*/
+        &content.data.get(0).unwrap().temp,
+        &(content.data.get(0).unwrap().rh),
+    );
 }
