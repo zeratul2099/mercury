@@ -1,5 +1,6 @@
 target
 settings.yaml
 weatherdump.json
-weatherbitdump.json
+weatherbitcurrdump.json
+weatherbitfcdump.json
 esp32.ino
