@@ -21,11 +21,13 @@ extern crate time;
 pub mod common;
 pub mod models;
 pub mod schema;
+pub mod weatherbit_model;
 
 use self::models::*;
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use common::{check_notification, establish_connection, get_settings, WeatherData};
+use weatherbit_model::{WeatherbitCurrent,WeatherbitForecast};
 use rocket::request::Form;
 use rocket::response::NamedFile;
 use rocket_contrib::json::Json;
@@ -52,7 +54,7 @@ fn main() {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,gauges,table,render_table,mean,single_mean])
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,weatherbit,gauges,table,render_table,mean,single_mean])
 //          .attach(Template::fairing())
         .attach(Template::custom(move |engines| {
             engines.tera.register_function("convert_tz", make_convert_tz(timezone));
@@ -117,6 +119,13 @@ struct WeatherContext {
     conditions: WeatherData,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+struct WeatherbitContext {
+    current: WeatherbitCurrent,
+    forecast: WeatherbitForecast,
+}
+
+
 #[get("/weather")]
 fn weather() -> Template {
     let mut file = File::open("weatherdump.json").unwrap();
@@ -127,6 +136,23 @@ fn weather() -> Template {
         conditions: conditions,
     };
     Template::render("weather", context)
+}
+
+#[get("/weatherbit")]
+fn weatherbit() -> Template {
+    let mut file = File::open("weatherbitcurrdump.json").unwrap();
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    let current: WeatherbitCurrent = serde_json::from_str(&buf).unwrap();
+    let mut file = File::open("weatherbitfcdump.json").unwrap();
+    let mut buf = String::new();
+    file.read_to_string(&mut buf).unwrap();
+    let forecast: WeatherbitForecast = serde_json::from_str(&buf).unwrap();
+    let context = WeatherbitContext {
+        current: current,
+        forecast: forecast,
+    };
+    Template::render("weatherbit", context)
 }
 
 #[get("/table")]
