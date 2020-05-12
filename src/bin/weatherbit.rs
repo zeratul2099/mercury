@@ -35,40 +35,40 @@ fn main() {
         settings.weatherbit_api_key, settings.lat_lon.0, settings.lat_lon.1
     );
     println!("{}", curr_url);
-    let content: WeatherbitCurrent = reqwest::get(curr_url.as_str()).unwrap().json().unwrap(); //.expect("weather request failed");
+    let current: WeatherbitCurrent = reqwest::get(curr_url.as_str()).unwrap().json().unwrap(); //.expect("weather request failed");
     println!(
         "t: {}, h: {}, {}, wspd: {}",
-        content.data.get(0).unwrap().temp,
-        content.data.get(0).unwrap().rh,
-        content.data.get(0).unwrap().weather.description,
-        content.data.get(0).unwrap().wind_spd
+        current.data.get(0).unwrap().temp,
+        current.data.get(0).unwrap().rh,
+        current.data.get(0).unwrap().weather.description,
+        current.data.get(0).unwrap().wind_spd
     );
-    println!("{}", serde_json::to_string_pretty(&content).unwrap());
+    println!("{}", serde_json::to_string_pretty(&current).unwrap());
     let file = File::create("weatherbitcurrdump.json").unwrap();
-    serde_json::to_writer_pretty(&file, &content).unwrap();
+    serde_json::to_writer_pretty(&file, &current).unwrap();
     
     let fc_url = format!(
         "https://api.weatherbit.io/v2.0/forecast/daily?key={}&lat={}&lon={}",
         settings.weatherbit_api_key, settings.lat_lon.0, settings.lat_lon.1
     );
     println!("{}", fc_url);
-    let content: WeatherbitForecast = reqwest::get(fc_url.as_str()).unwrap().json().unwrap(); //.expect("weather request failed");
+    let forecast: WeatherbitForecast = reqwest::get(fc_url.as_str()).unwrap().json().unwrap(); //.expect("weather request failed");
     println!(
         "t: {}, h: {}, {}, wspd: {}",
-        content.data.get(0).unwrap().temp,
-        content.data.get(0).unwrap().rh,
-        content.data.get(0).unwrap().weather.description,
-        content.data.get(0).unwrap().wind_spd
+        forecast.data.get(0).unwrap().temp,
+        forecast.data.get(0).unwrap().rh,
+        forecast.data.get(0).unwrap().weather.description,
+        forecast.data.get(0).unwrap().wind_spd
     );
-    println!("{}", serde_json::to_string_pretty(&content).unwrap());
+    println!("{}", serde_json::to_string_pretty(&forecast).unwrap());
     let file = File::create("weatherbitfcdump.json").unwrap();
-    serde_json::to_writer_pretty(&file, &content).unwrap();
+    serde_json::to_writer_pretty(&file, &forecast).unwrap();
     let connection = establish_connection(&settings);
     insert_values(
         &connection,
         &settings,
         &0,
-        &content.data.get(0).unwrap().temp,
-        &(content.data.get(0).unwrap().rh),
+        &current.data.get(0).unwrap().temp,
+        &(current.data.get(0).unwrap().rh),
     );
 }

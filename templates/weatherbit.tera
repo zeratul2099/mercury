@@ -9,21 +9,6 @@
     {% block bodyscript %}
     <script type='text/javascript'>
         $(document).ready(function () {
-            var glide_h = new Glide('.glide_h', {
-                type: 'slider',
-                perView: 8,
-                startAt: 0,
-                focusAt: 0,
-                rewind: false,
-                breakpoints: {
-                    1680: {perView: 6},
-                    1080: {perView: 4},
-                    800: {perView: 3},
-                    600: {perView: 2},
-                    400: {perView: 1},
-                }
-            });
-            glide_h.mount();
             var glide_d = new Glide('.glide_d', {
                 type: 'slider',
                 perView: 7,
@@ -99,7 +84,7 @@
                         <th>Max Temp.</th>
                         <th>Pressure</th>
                         <th>Wind</th>
-                        <th>Probability</th>
+                        <th>Precipitation</th>
                         <th>Cloud Cover</th>
                     </tr>
                 {% for data in forecast.data %}
@@ -108,7 +93,7 @@
                     <td>{{ data.weather.description }}</td>
                     <td>{{ data.low_temp | round(precision=1) }}&#176;C</td>
                     <td>{{ data.high_temp | round(precision=1) }}&#176;C</td>
-                    <td>{{ data.pres | round(precision=1) }} hPa</td>
+                    <td>{{ data.pres | round(precision=1) }} mbar</td>
                     <td>{{ data.wind_spd | round(precision=1) }} m/s</td>
                     <td>{{ data.precip | round(precision=3) }} mm/h</td>
                     <td>{{ data.clouds | round(precision=3)}}</td>
