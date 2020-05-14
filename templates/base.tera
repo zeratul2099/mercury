@@ -19,6 +19,5 @@
         <div id='content_container' class='content'>
         {% block content %}{% endblock content %}
         </div>
-        <div id='footer'>Outside <a style='color: lightgray' href='https://darksky.net/poweredby/'>Powered by Darksky</a></div>
     </body>
 </html>

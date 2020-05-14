@@ -126,7 +126,7 @@ struct WeatherbitContext {
 }
 
 
-#[get("/weather")]
+#[get("/deprecated_darksky")]
 fn weather() -> Template {
     let mut file = File::open("weatherdump.json").unwrap();
     let mut buf = String::new();
@@ -138,7 +138,7 @@ fn weather() -> Template {
     Template::render("weather", context)
 }
 
-#[get("/weatherbit")]
+#[get("/weather")]
 fn weatherbit() -> Template {
     let mut file = File::open("weatherbitcurrdump.json").unwrap();
     let mut buf = String::new();

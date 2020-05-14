@@ -37,7 +37,7 @@
             </ul>
             <div id="tab-currently">
                 <h2>Current weather conditions</h2>
-                <h3><div><img src="/static/weather_icons/{{ current.data.0.weather.icon }}.svg" alt="{{ current.data.0.weather.description }}" /></div>{{ current.data.0.weather.description }}</h3>
+                <h3><div><img src="/static/weather_icons/weatherbit/{{ current.data.0.weather.icon }}.png" alt="{{ current.data.0.weather.description }}" /></div>{{ current.data.0.weather.description }}</h3>
                 <table>
                     <tr><td>Temperature</td><td>{{ current.data.0.temp | round(precision=1) }}&#176;C</td></tr>
                     <tr><td>Apparent Temperature</td><td>{{ current.data.0.app_temp | round(precision=1) }}&#176;C</td></tr>
@@ -48,7 +48,7 @@
                     <tr><td>Wind Direction</td><td>{{ current.data.0.wind_dir }}&#176; {{ current.data.0.wind_cdir_full }}</td></tr>
                     <tr><td>Cloud Cover</td><td>{{ current.data.0.clouds }}&#37;</td></tr>
                     <tr><td>Status retrieved</td><td>{{ convert_tz(datetime=current.data.0.ts, format="%Y-%m-%dT%H:%M:%S") }}</td></tr>
-                    <tr><td>Status measured</td><td>{{ current.data.0.last_ob_time }}</td></tr>
+                    <tr><td>Status measured</td><td>{{ current.data.0.last_ob_time }} UTC</td></tr>
                 </table>
             </div>
             <div id="tab-daily">
@@ -62,7 +62,7 @@
                                 <div style="border-width: 1px; border-style: solid; text-align: center; padding: 5px;">
                                     <div>{{ convert_tz(datetime=data.ts, format="%a, %d.%m.") }}</div>
                                     <div>{{ data.weather.description }}</div>
-                                    <div><img src="/static/weather_icons/{{ data.weather.icon }}.svg" alt="{{ data.weather.code }}" /></div>
+                                    <div><img src="/static/weather_icons/weatherbit/{{ data.weather.icon }}.png" alt="{{ data.weather.code }}" /></div>
                                     <div><h2>{{ data.high_temp | round(precision=1) }}°C</h2></div>
                                     <div><h2>{{ data.low_temp | round(precision=1) }}°C</h2></div>
                                     <div><span>{{ data.wind_spd | round(precision=1) }}m/s</span> <span>{{ data.precip | round(precision=3) }}</span></div>
