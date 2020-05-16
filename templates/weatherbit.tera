@@ -41,12 +41,15 @@
                 <table>
                     <tr><td>Temperature</td><td>{{ current.data.0.temp | round(precision=1) }}&#176;C</td></tr>
                     <tr><td>Apparent Temperature</td><td>{{ current.data.0.app_temp | round(precision=1) }}&#176;C</td></tr>
-                    <tr><td>Relative Humidity</td><td>{{ current.data.0.rh | round(precision=2) }}{#&#37;#}</td></tr>
+                    <tr><td>Relative Humidity</td><td>{{ current.data.0.rh | round(precision=2) }}&#37;</td></tr>
                     <tr><td>Dew Point</td><td>{{ current.data.0.dewpt }}&#176;C</td></tr>
                     <tr><td>Pressure</td><td>{{ current.data.0.pres }}hPa</td></tr>
                     <tr><td>Wind Speed</td><td>{{ current.data.0.wind_spd | round(precision=2) }}m/s</td></tr>
                     <tr><td>Wind Direction</td><td>{{ current.data.0.wind_dir }}&#176; {{ current.data.0.wind_cdir_full }}</td></tr>
                     <tr><td>Cloud Cover</td><td>{{ current.data.0.clouds }}&#37;</td></tr>
+                    <tr><td>Sunrise</td><td>{{ current.data.0.sunrise }}</td></tr>
+                    <tr><td>Sunset</td><td>{{ current.data.0.sunset }}</td></tr>
+                    <tr><td colspan=2 ><hr></td></tr>
                     <tr><td>Status retrieved</td><td>{{ convert_tz(datetime=current.data.0.ts, format="%Y-%m-%dT%H:%M:%S") }}</td></tr>
                     <tr><td>Status measured</td><td>{{ current.data.0.last_ob_time }} UTC</td></tr>
                 </table>
