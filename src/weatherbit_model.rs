@@ -38,7 +38,7 @@ pub struct CurrentData {
     pub city_name: String,
     pub wind_spd: f64,
     //pub last_ob_time: DateTime<Utc>,
-    pub last_ob_time: String,
+    //pub last_ob_time: String,
     pub wind_cdir_full: String,
     pub wind_cdir: String,
     pub slp: f64,
@@ -96,22 +96,22 @@ pub struct ForecastData {
     pub temp: f32,
     pub max_temp: f32,
     pub min_temp: f32,
-    pub high_temp: f32,
-    pub low_temp: f32,
+    pub high_temp: Option<f32>,
+    pub low_temp: Option<f32>,
     pub app_min_temp: f32,
     pub app_max_temp: f32,
     pub ozone: f32,
     pub snow_depth: i32,
     pub pop: i32,
     pub dewpt: f32,
-    //pub max_dhi: f32,
+    pub max_dhi: Option<f32>,
     pub precip: f32,
 
 }
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CurrentDataWeather {
     pub icon: String,
-    pub code: String,
+    pub code: i32,
     pub description: String,
 }
 

@@ -51,7 +51,7 @@
                     <tr><td>Sunset</td><td>{{ current.data.0.sunset }}</td></tr>
                     <tr><td colspan=2 ><hr></td></tr>
                     <tr><td>Status retrieved</td><td>{{ convert_tz(datetime=current.data.0.ts, format="%Y-%m-%dT%H:%M:%S") }}</td></tr>
-                    <tr><td>Status measured</td><td>{{ current.data.0.last_ob_time }} UTC</td></tr>
+                    <tr><td>Status measured</td><td>{{ current.data.0.ob_time }} UTC</td></tr>
                 </table>
             </div>
             <div id="tab-daily">
@@ -66,8 +66,8 @@
                                     <div>{{ convert_tz(datetime=data.ts, format="%a, %d.%m.") }}</div>
                                     <div>{{ data.weather.description }}</div>
                                     <div><img src="/static/weather_icons/weatherbit/{{ data.weather.icon }}.png" alt="{{ data.weather.code }}" /></div>
-                                    <div><h2>{{ data.high_temp | round(precision=1) }}°C</h2></div>
-                                    <div><h2>{{ data.low_temp | round(precision=1) }}°C</h2></div>
+                                    <div><h2>{{ data.max_temp | round(precision=1) }}°C</h2></div>
+                                    <div><h2>{{ data.min_temp | round(precision=1) }}°C</h2></div>
                                     <div><span>{{ data.wind_spd | round(precision=1) }}m/s</span> <span>{{ data.precip | round(precision=3) }}</span></div>
                                 </div>
                             </li>
@@ -94,8 +94,8 @@
                 <tr class="evenodd">
                     <td>{{ convert_tz(datetime=data.ts, format="%a, %d.%m.") }}</td>
                     <td>{{ data.weather.description }}</td>
-                    <td>{{ data.low_temp | round(precision=1) }}&#176;C</td>
-                    <td>{{ data.high_temp | round(precision=1) }}&#176;C</td>
+                    <td>{{ data.min_temp | round(precision=1) }}&#176;C</td>
+                    <td>{{ data.max_temp | round(precision=1) }}&#176;C</td>
                     <td>{{ data.pres | round(precision=1) }} mbar</td>
                     <td>{{ data.wind_spd | round(precision=1) }} m/s</td>
                     <td>{{ data.precip | round(precision=3) }} mm/h</td>
