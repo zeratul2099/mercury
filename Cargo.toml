@@ -11,6 +11,8 @@ yaml-rust = "0.4"
 diesel = { version = "1.0.0", features = ["mysql", "chrono"] }
 rocket = "0.4.0"
 rocket_contrib = {version = "0.4.0", features = ["tera_templates"]}
+actix-web = "2.0"
+actix-rt = "1.0"
 itertools = "*"
 lazy_static = "1.1.0"
 reqwest = "0.9.*" # TODO: upgrade to 0.10
