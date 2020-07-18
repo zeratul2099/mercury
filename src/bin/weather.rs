@@ -22,7 +22,7 @@ mod models;
 mod schema;
 
 use self::models::insert_values;
-use common::{establish_connection, get_settings, WeatherData};
+use crate::common::{establish_connection, get_settings, WeatherData};
 use std::fs::File;
 
 fn main() {

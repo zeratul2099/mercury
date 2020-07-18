@@ -3,6 +3,7 @@ name = "mercury"
 version = "0.1.0"
 authors = ["Marko <zeratul@posteo.de>"]
 default-run = "mercury"
+edition = "2018"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }

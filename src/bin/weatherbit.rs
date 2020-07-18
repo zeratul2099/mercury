@@ -24,8 +24,8 @@ mod models;
 mod schema;
 
 use self::models::insert_values;
-use common::{establish_connection, get_settings};
-use weatherbit_model::{WeatherbitCurrent, WeatherbitForecast};
+use crate::common::{establish_connection, get_settings};
+use crate::weatherbit_model::{WeatherbitCurrent, WeatherbitForecast};
 use std::fs::File;
 
 fn main() {

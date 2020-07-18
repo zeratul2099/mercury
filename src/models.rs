@@ -1,7 +1,7 @@
 use super::schema::sensor_log;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use common::Settings;
+use crate::common::Settings;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
 use itertools::sorted;
