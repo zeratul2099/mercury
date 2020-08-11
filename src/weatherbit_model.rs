@@ -1,8 +1,8 @@
 extern crate reqwest;
 extern crate yaml_rust;
 
-
-
+use chrono::{DateTime, Utc};
+use serde_json::Value;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct WeatherbitCurrent {
@@ -111,7 +111,7 @@ pub struct ForecastData {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CurrentDataWeather {
     pub icon: String,
-    pub code: i32,
+    pub code: Value,
     pub description: String,
 }
 
