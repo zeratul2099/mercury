@@ -1,4 +1,4 @@
-{% extends "base" %}
+{% extends "base.tera" %}
     {% block head %}
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css" integrity="sha256-hzfEy51WIdFRQy2Hu0Nl5eWTbzT4Kt4ISYYBLyUmfdc=" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>

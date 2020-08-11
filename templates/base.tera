@@ -8,7 +8,7 @@
     <body>
     <div id='header'>
             <div><h3>
-                <a href='/table'>Table</a> 
+                <a href='/table/all'>Table</a> 
                 <a href='/simple'>Simple</a>
                 <a href='/plots'>Plots</a>
                 <a href='/gauges'>Gauges</a>
