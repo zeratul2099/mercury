@@ -16,6 +16,7 @@ actix-web = "2.0"
 actix-rt = "1.0"
 actix-http = "1.0" 
 actix-files = "0.2"
+env_logger = "0.7.1"
 itertools = "*"
 lazy_static = "1.1.0"
 reqwest = "0.9.*" # TODO: upgrade to 0.10

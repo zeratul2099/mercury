@@ -225,6 +225,8 @@ async fn send(
 async fn main() -> std::io::Result<()> {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
     HttpServer::new(move|| {
         let mut tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/*")).unwrap();
         tera.register_function("convert_tz", make_convert_tz(timezone));
