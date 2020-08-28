@@ -1,7 +1,6 @@
 extern crate reqwest;
 extern crate yaml_rust;
 
-use chrono::{DateTime, Utc};
 use serde_json::Value;
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -28,7 +27,6 @@ pub struct CurrentData {
     pub lon: f64,
     pub pres: f64,
     pub timezone: String,
-    //pub ob_time: DateTime<Utc>,
     pub ob_time: String,
     pub country_code: String,
     pub clouds: i64,
@@ -37,8 +35,6 @@ pub struct CurrentData {
     pub state_code: String,
     pub city_name: String,
     pub wind_spd: f64,
-    //pub last_ob_time: DateTime<Utc>,
-    //pub last_ob_time: String,
     pub wind_cdir_full: String,
     pub wind_cdir: String,
     pub slp: f64,
@@ -57,7 +53,6 @@ pub struct CurrentData {
     pub aqi: i64,
     pub lat: f64,
     pub weather: CurrentDataWeather,
-    //pub datetime: DateTime<Utc>,
     pub datetime: String,
     pub temp: f32,
     pub station: String,
@@ -89,7 +84,6 @@ pub struct ForecastData {
     pub moon_phase: f32,
     pub moon_phase_lunation: f32,
     pub weather: ForecastDataWeather,
-    //pub datetime: DateTime<Utc>,
     pub datetime: String,
     pub valid_date: String,
     pub ts: i64,

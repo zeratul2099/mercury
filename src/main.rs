@@ -26,7 +26,7 @@ pub mod weatherbit_model;
 use self::models::*;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use crate::common::{check_notification, establish_connection, get_settings, WeatherData};
+use crate::common::{check_notification, establish_connection, get_settings};
 use crate::weatherbit_model::{WeatherbitCurrent,WeatherbitForecast};
 use rocket::request::Form;
 use rocket::response::NamedFile;
@@ -54,7 +54,7 @@ fn main() {
     let settings = get_settings();
     let timezone: Tz = settings.timezone.parse().unwrap();
     rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weather,weatherbit,gauges,table,render_table,mean,single_mean])
+        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weatherbit,gauges,table,render_table,mean,single_mean])
 //          .attach(Template::fairing())
         .attach(Template::custom(move |engines| {
             engines.tera.register_function("convert_tz", make_convert_tz(timezone));
@@ -115,27 +115,9 @@ fn gauges() -> Template {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct WeatherContext {
-    conditions: WeatherData,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
 struct WeatherbitContext {
     current: WeatherbitCurrent,
     forecast: WeatherbitForecast,
-}
-
-
-#[get("/deprecated_darksky")]
-fn weather() -> Template {
-    let mut file = File::open("weatherdump.json").unwrap();
-    let mut buf = String::new();
-    file.read_to_string(&mut buf).unwrap();
-    let conditions: WeatherData = serde_json::from_str(&buf).unwrap();
-    let context = WeatherContext {
-        conditions: conditions,
-    };
-    Template::render("weather", context)
 }
 
 #[get("/weather")]

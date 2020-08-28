@@ -3,8 +3,6 @@ extern crate reqwest;
 extern crate yaml_rust;
 
 use self::yaml_rust::yaml;
-use chrono::serde::ts_seconds;
-use chrono::{DateTime, Utc};
 use chrono_tz::Tz;
 use diesel::mysql::MysqlConnection;
 use diesel::prelude::*;
@@ -15,91 +13,6 @@ use std::sync::Mutex;
 
 lazy_static! {
     static ref NOTIFIED: Mutex<HashSet<usize>> = Mutex::new(HashSet::new());
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct WeatherData {
-    pub latitude: f64,
-    pub longitude: f64,
-    pub timezone: String,
-    pub currently: HourData,
-    pub hourly: HourSet,
-    pub daily: DaySet,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[allow(non_snake_case)]
-pub struct DaySet {
-    pub summary: String,
-    pub icon: String,
-    pub data: Vec<DayData>,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[allow(non_snake_case)]
-pub struct HourSet {
-    pub summary: String,
-    pub icon: String,
-    pub data: Vec<HourData>,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[allow(non_snake_case)]
-pub struct HourData {
-    #[serde(with = "ts_seconds")]
-    pub time: DateTime<Utc>,
-    pub summary: String,
-    pub icon: String,
-    pub precipIntensity: f32,
-    pub precipProbability: f32,
-    pub temperature: f32,
-    pub apparentTemperature: f64,
-    pub dewPoint: f64,
-    pub humidity: f32,
-    pub pressure: f64,
-    pub windSpeed: f64,
-    pub windGust: f64,
-    pub windBearing: i32,
-    pub cloudCover: f64,
-    pub uvIndex: i32,
-    pub visibility: f64,
-    pub ozone: f64,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[allow(non_snake_case)]
-pub struct DayData {
-    #[serde(with = "ts_seconds")]
-    pub time: DateTime<Utc>,
-    pub summary: String,
-    pub icon: String,
-    pub sunriseTime: i32,
-    pub sunsetTime: i32,
-    pub moonPhase: f32,
-    pub precipIntensity: f32,
-    pub precipIntensityMax: f32,
-    pub precipIntensityMaxTime: Option<i32>,
-    pub precipProbability: f32,
-    pub temperatureHigh: f32,
-    pub temperatureHighTime: Option<i32>,
-    pub temperatureLow: f32,
-    pub temperatureLowTime: Option<i32>,
-    pub apparentTemperatureHigh: f32,
-    pub apparentTemperatureHighTime: Option<i32>,
-    pub apparentTemperatureLow: f32,
-    pub apparentTemperatureLowTime: Option<i32>,
-    pub dewPoint: f32,
-    pub humidity: f32,
-    pub pressure: f32,
-    pub windSpeed: f32,
-    pub windGust: f32,
-    pub windGustTime: i32,
-    pub windBearing: i32,
-    pub cloudCover: f32,
-    pub uvIndex: i32,
-    pub uvIndexTime: i32,
-    pub visibility: f64,
-    pub ozone: f64,
 }
 
 pub struct Settings {
