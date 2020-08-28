@@ -1,69 +1,38 @@
+//#![feature(plugin, custom_derive)]
 #![allow(proc_macro_derive_resolution_fallback, dead_code)]
-#![feature(plugin, proc_macro_hygiene, decl_macro)]
-#[macro_use]
-extern crate rocket;
-extern crate itertools;
-extern crate rocket_contrib;
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
-
 #[macro_use]
 extern crate diesel;
 extern crate chrono;
 extern crate chrono_tz;
-extern crate tera;
-extern crate time;
 
-pub mod common;
+//#[path = "../common.rs"]
+mod common;
+//#[path = "../models.rs"]
 pub mod models;
+//#[path = "../schema.rs"]
 pub mod schema;
+//#[path = "../weatherbit_model.rs"]
 pub mod weatherbit_model;
-
 use self::models::*;
+use actix_files::Files;
+use actix_web::{get, web, App, HttpResponse, HttpServer, Responder, middleware, error, Error, Result};
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use crate::common::{check_notification, establish_connection, get_settings};
-use crate::weatherbit_model::{WeatherbitCurrent,WeatherbitForecast};
-use rocket::request::Form;
-use rocket::response::NamedFile;
-use rocket_contrib::json::Json;
-use rocket_contrib::templates::Template;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::{Path, PathBuf};
-use tera::{from_value, to_value, Error, GlobalFn, Value};
-
-#[derive(FromForm)]
-struct SendQuery {
-    id: i32,
-    t: f32,
-    h: f32,
-}
-
-#[derive(FromForm)]
-struct PlotQuery {
-    old: bool,
-}
-
-fn main() {
-    let settings = get_settings();
-    let timezone: Tz = settings.timezone.parse().unwrap();
-    rocket::ignite()
-        .mount("/", routes![send,latest,history,files,simple,plots,oldplots,weatherbit,gauges,table,render_table,mean,single_mean])
-//          .attach(Template::fairing())
-        .attach(Template::custom(move |engines| {
-            engines.tera.register_function("convert_tz", make_convert_tz(timezone));
-        }))
-        .launch();
-}
+use tera::{Tera, GlobalFn, Value, from_value, to_value, Error as TeraError};
+use crate::common::{check_notification,establish_connection, get_settings};
+use crate::models::get_latest_values;
+use crate::weatherbit_model::{WeatherbitCurrent,WeatherbitForecast};
 
 fn make_convert_tz(timezone: Tz) -> GlobalFn {
-    Box::new(move |args| -> Result<Value, Error> {
+    Box::new(move |args| -> Result<Value, TeraError> {
         match args.get("datetime") {
             Some(val) => match from_value::<i64>(val.clone()) {
                 Ok(v) => match args.get("format") {
@@ -84,34 +53,44 @@ fn make_convert_tz(timezone: Tz) -> GlobalFn {
     })
 }
 
+#[get("/")]
+async fn index() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
+}
+
 #[get("/simple")]
-fn simple() -> Template {
-    let mut context = HashMap::new();
+async fn simple(
+    tmpl: web::Data<tera::Tera>,
+) -> Result<HttpResponse, Error> {
+    let mut context = tera::Context::new();
     let settings = get_settings();
     let connection = establish_connection(&settings);
     let values = get_latest_values(&connection, &settings, 1, None);
-    context.insert("latest_values".to_string(), values);
-    Template::render("simple", context)
+    context.insert("latest_values", &values);
+    let s = tmpl.render("simple.tera", &context)
+        .map_err(|_| error::ErrorInternalServerError("TemplateError"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 #[get("/plots")]
-fn plots() -> Template {
-    let context = HashMap::<String, String>::new();
-    Template::render("plots", context)
-}
-
-#[get("/oldplots")]
-fn oldplots() -> Template {
-    let context = HashMap::<String, String>::new();
-    Template::render("plots_old", context)
+async fn plots(
+    tmpl: web::Data<tera::Tera>,
+) -> Result<HttpResponse, Error> {
+    let s = tmpl.render("plots.tera", &tera::Context::new())
+        .map_err(|_| error::ErrorInternalServerError("TemplateError"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 #[get("/gauges")]
-fn gauges() -> Template {
+async fn gauges(
+    tmpl: web::Data<tera::Tera>,
+) -> Result<HttpResponse, Error> {
+    let mut context = tera::Context::new();
     let settings = get_settings();
-    let mut context = HashMap::new();
-    context.insert("num_sensors".to_string(), settings.sensor_map.len());
-    Template::render("gauges", context)
+    context.insert("num_sensors", &settings.sensor_map.len());
+    let s = tmpl.render("gauges.tera", &context)
+        .map_err(|_| error::ErrorInternalServerError("TemplateError"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -121,7 +100,9 @@ struct WeatherbitContext {
 }
 
 #[get("/weather")]
-fn weatherbit() -> Template {
+async fn weatherbit(
+    tmpl: web::Data<tera::Tera>,
+) -> Result<HttpResponse, Error> {
     let mut file = File::open("weatherbitcurrdump.json").unwrap();
     let mut buf = String::new();
     file.read_to_string(&mut buf).unwrap();
@@ -134,26 +115,91 @@ fn weatherbit() -> Template {
         current: current,
         forecast: forecast,
     };
-    Template::render("weatherbit", context)
+    let s = tmpl.render("weatherbit.tera", &context).unwrap();
+//        .map_err(|_| error::ErrorInternalServerError("TemplateError"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
-#[get("/table")]
-fn table() -> Template {
-    render_table(None)
-}
-
-#[get("/table/<s_id>")]
-fn render_table(s_id: Option<i32>) -> Template {
+#[get("/table/{s_id}")]
+async fn table(
+    path: web::Path<(String,)>,
+    tmpl: web::Data<tera::Tera>,
+) -> Result<HttpResponse, Error> {
     let settings = get_settings();
     let connection = establish_connection(&settings);
+
+    let s_id: Option<i32> = path.0.parse::<i32>().ok();
+    //match Some(path.0.parse::<i32>()) {
+    //    Ok(s_id) => s_id,
+    //    Err(e) => None,
+    //}
+
     let values = get_latest_values(&connection, &settings, 100, s_id);
-    let mut context = HashMap::new();
-    context.insert("result".to_string(), values);
-    Template::render("table", context)
+    let mut context = tera::Context::new();
+    context.insert("result", &values);
+
+
+    let s = tmpl.render("table.tera", &context)
+        .map_err(|_| error::ErrorInternalServerError("TemplateError"))?;
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
-#[get("/api/send?<query..>")]
-fn send(query: Form<SendQuery>) -> String {
+#[get("/api/latest")]
+async fn latest() -> HttpResponse { 
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_latest_values(&connection, &settings, 1, None);
+    HttpResponse::Ok().json(values)
+}
+
+#[get("/api/history/{days}")]
+async fn history(
+        path: web::Path<(i64,)>,
+) -> HttpResponse {
+
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let values = get_history(&connection, &settings, path.0);
+    HttpResponse::Ok().json(values)
+}
+
+#[get("/api/single_mean/{s_id}/{date}")]
+async fn single_mean(
+        path: web::Path<(i32, String,)>,
+) -> HttpResponse {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let date = format!("{}T00:00:00Z", path.1);
+    let date = DateTime::parse_from_rfc3339(&date).unwrap().naive_utc();
+    let values = get_day_mean_min_max_values(&connection, &path.0, date);
+    HttpResponse::Ok().json(values)
+}
+
+#[get("/api/mean/{begin}/{end}")]
+async fn mean(
+        path: web::Path<(String, String,)>,
+) -> HttpResponse {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let begin = format!("{}T00:00:00Z", path.0);
+    let begin = DateTime::parse_from_rfc3339(&begin).unwrap().naive_utc();
+    let end = format!("{}T00:00:00Z", path.1);
+    let end = DateTime::parse_from_rfc3339(&end).unwrap().naive_utc();
+    let values = get_timespan_mean_min_max_values(&connection, &settings, begin, end);
+    HttpResponse::Ok().json(values)
+}
+
+#[derive(Deserialize)]
+struct SensorData {
+    id: i32,
+    t: f32,
+    h: f32,
+}
+
+#[get("/api/send")]
+async fn send(
+    query: web::Query<SensorData>,
+) -> HttpResponse {
     let settings = get_settings();
     let connection = establish_connection(&settings);
     // HACK to fix decimal formatting errors of arduino implementation
@@ -172,48 +218,35 @@ fn send(query: Form<SendQuery>) -> String {
     insert_values(&connection, &settings, &query.id, &temp, &hum);
     check_notification(&settings, query.id as i64, &"t".to_string(), query.t as f64);
     check_notification(&settings, query.id as i64, &"h".to_string(), query.h as f64);
-    "OK".to_string()
+    HttpResponse::Ok().body("OK")
 }
 
-#[get("/api/latest")]
-fn latest() -> Json<Vec<(String, String, String, f32, f32, bool)>> {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
     let settings = get_settings();
-    let connection = establish_connection(&settings);
-    let values = get_latest_values(&connection, &settings, 1, None);
-    Json(values)
-}
-
-#[get("/api/history/<days>")]
-fn history(days: i64) -> Json<Vec<(i32, String, Vec<(String, f32, f32)>)>> {
-    let settings = get_settings();
-    let connection = establish_connection(&settings);
-    let values = get_history(&connection, &settings, days);
-    Json(values)
-}
-
-#[get("/api/single_mean/<s_id>/<date>")]
-fn single_mean(s_id: i32, date: String) -> Json<(f32, f32, f32, f32, f32, f32)> {
-    let settings = get_settings();
-    let connection = establish_connection(&settings);
-    let date = format!("{}T00:00:00Z", date);
-    let date = DateTime::parse_from_rfc3339(&date).unwrap().naive_utc();
-    let values = get_day_mean_min_max_values(&connection, &s_id, date);
-    Json(values)
-}
-
-#[get("/api/mean/<begin>/<end>")]
-fn mean(begin: String, end: String) -> Json<Vec<(i32, String, Vec<(NaiveDateTime, f32, f32, f32, f32, f32, f32)>)>> {
-    let settings = get_settings();
-    let connection = establish_connection(&settings);
-    let begin = format!("{}T00:00:00Z", begin);
-    let begin = DateTime::parse_from_rfc3339(&begin).unwrap().naive_utc();
-    let end = format!("{}T00:00:00Z", end);
-    let end = DateTime::parse_from_rfc3339(&end).unwrap().naive_utc();
-    let values = get_timespan_mean_min_max_values(&connection, &settings, begin, end);
-    Json(values)
-}
-
-#[get("/static/<file..>")]
-fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("static/").join(file)).ok()
+    let timezone: Tz = settings.timezone.parse().unwrap();
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
+    HttpServer::new(move|| {
+        let mut tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/*")).unwrap();
+        tera.register_function("convert_tz", make_convert_tz(timezone));
+        App::new()
+            .data(tera)
+            .wrap(middleware::Logger::default())
+            .service(index)
+            .service(simple)
+            .service(plots)
+            .service(gauges)
+            .service(weatherbit)
+            .service(table)
+            .service(latest)
+            .service(history)
+            .service(single_mean)
+            .service(mean)
+            .service(send)
+            .service(Files::new("/static", "./static/"))
+        })
+        .bind("0.0.0.0:5001")?
+        .run()
+        .await
 }

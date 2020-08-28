@@ -1,6 +1,6 @@
 [package]
 name = "mercury"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Marko <zeratul@posteo.de>"]
 default-run = "mercury"
 edition = "2018"
@@ -10,8 +10,6 @@ chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.5"
 yaml-rust = "0.4"
 diesel = { version = "1.0.0", features = ["mysql", "chrono"] }
-rocket = "0.4.0"
-rocket_contrib = {version = "0.4.0", features = ["tera_templates"]}
 actix-web = "2.0"
 actix-rt = "1.0"
 actix-http = "1.0" 
