@@ -23,3 +23,7 @@ serde_json = "1.0.*"
 serde_derive = "1.0.*"
 time = "*"
 tera = "0.*" # TODO: upgrade to 1.0
+openssl-probe = "0.1.2"
+
+[patch.crates-io]
+mysqlclient-sys = { git = "https://github.com/pzmarzly/mysqlclient-sys", rev = "acd1b2b" }

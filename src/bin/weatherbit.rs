@@ -12,6 +12,7 @@ extern crate serde_json;
 extern crate diesel;
 extern crate chrono;
 extern crate chrono_tz;
+extern crate openssl_probe;
 extern crate time;
 
 #[path = "../common.rs"]
@@ -29,6 +30,7 @@ use crate::weatherbit_model::{WeatherbitCurrent, WeatherbitForecast};
 use std::fs::File;
 
 fn main() {
+    openssl_probe::init_ssl_cert_env_vars();
     let settings = get_settings();
     let curr_url = format!(
         "https://api.weatherbit.io/v2.0/current?key={}&lat={}&lon={}",

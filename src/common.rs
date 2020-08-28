@@ -17,11 +17,9 @@ lazy_static! {
 
 pub struct Settings {
     #[allow(dead_code)]
-    pub device: String,
     pub database: String,
     pub sensor_map: HashMap<String, String>,
     pub timezone: String,
-    pub darksky_api_key: String,
     pub weatherbit_api_key: String,
     pub lat_lon: (f64, f64),
     pub pa_app_token: String,
@@ -54,14 +52,12 @@ pub fn get_settings() -> Settings {
         ));
     }
     let settings = Settings {
-        device: String::from(docs[0]["device"].as_str().unwrap()),
         database: String::from(str::replace(
             docs[0]["database"].as_str().unwrap(),
             "+pymysql",
             "",
         )),
         timezone: String::from(docs[0]["timezone"].as_str().unwrap()),
-        darksky_api_key: String::from(docs[0]["darksky_api_key"].as_str().unwrap()),
         weatherbit_api_key: String::from(docs[0]["weatherbit_api_key"].as_str().unwrap()),
         lat_lon: (lat, lon),
         pa_app_token: String::from(docs[0]["pa_app_token"].as_str().unwrap()),
