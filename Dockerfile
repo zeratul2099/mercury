@@ -21,14 +21,15 @@ WORKDIR ${APP}
 
 EXPOSE 5001
 RUN apt-get update && apt-get install -y cron ca-certificates
-RUN echo "*/15 * * * * cd ${APP}; ./weatherbit" | crontab
-RUN /etc/init.d/cron start
+RUN echo "*/15 * * * * cd ${APP}; ./weatherbit >> /var/log/weatherbit" | crontab
+RUN echo "#!/bin/sh\n/etc/init.d/cron start\ncd ${APP}\n./mercury" > ${APP}/start.sh
+RUN chmod +x ${APP}/start.sh
 COPY --from=builder ${APP}/target/x86_64-unknown-linux-musl/release/mercury ./mercury
 COPY --from=builder ${APP}/target/x86_64-unknown-linux-musl/release/weatherbit ./weatherbit
 COPY --from=builder ${APP}/templates ./templates
 COPY --from=builder ${APP}/static ./static
 
-ENTRYPOINT ["./mercury"]
+ENTRYPOINT ["./start.sh"]
 
 # Start container with
 # docker run -dP -p5001:5001  --mount type=bind,source=/<path-to>/settings.yaml,target=/home/rust/mercury/settings.yaml --name mercury localhost:5000/mercury:latest
