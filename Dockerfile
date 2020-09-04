@@ -27,6 +27,8 @@ COPY --from=builder ${APP}/target/x86_64-unknown-linux-musl/release/mercury ./me
 COPY --from=builder ${APP}/target/x86_64-unknown-linux-musl/release/weatherbit ./weatherbit
 COPY --from=builder ${APP}/templates ./templates
 COPY --from=builder ${APP}/static ./static
-COPY --from=builder ${APP}/settings.yaml .
 
 ENTRYPOINT ["./mercury"]
+
+# Start container with
+# docker run -dP -p5001:5001  --mount type=bind,source=/<path-to>/settings.yaml,target=/home/rust/mercury/settings.yaml --name mercury localhost:5000/mercury:latest
