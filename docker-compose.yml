@@ -1,6 +1,7 @@
 version: '2.0'
 services:
     mercury:
+        build: .
         image: localhost:5000/mercury:latest
         ports:
         - "5001:5001"
