@@ -66,8 +66,8 @@
                                     <div>{{ convert_tz(datetime=data.ts, format="%a, %d.%m.") }}</div>
                                     <div>{{ data.weather.description }}</div>
                                     <div><img src="/static/weather_icons/weatherbit/{{ data.weather.icon }}.png" alt="{{ data.weather.code }}" /></div>
-                                    <div><h2>{{ data.max_temp | round(precision=1) }}°C</h2></div>
-                                    <div><h2>{{ data.min_temp | round(precision=1) }}°C</h2></div>
+                                    <div><h2>{{ data.max_temp | round(precision=1) }}&#176;C</h2></div>
+                                    <div><h2>{{ data.min_temp | round(precision=1) }}&#176;C</h2></div>
                                     <div><span>{{ data.wind_spd | round(precision=1) }}m/s</span> <span>{{ data.precip | round(precision=3) }}</span></div>
                                 </div>
                             </li>
