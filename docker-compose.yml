@@ -1,7 +1,7 @@
 version: '2.0'
 services:
     mercury:
-        image: localhost:5000/mercury:latest
+        image: "${MERCURY_IMAGE}"
         ports:
         - "5001:5001"
         volumes:

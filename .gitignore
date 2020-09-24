@@ -4,3 +4,4 @@ weatherdump.json
 weatherbitcurrdump.json
 weatherbitfcdump.json
 esp32.ino
+.env
