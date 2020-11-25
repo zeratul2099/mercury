@@ -31,5 +31,14 @@ COPY --from=builder ${APP}/static ./static
 
 ENTRYPOINT ["./start.sh"]
 
+# Push image to you local registry with
+# docker build -t <hostname>:5000/mercury:latest .
+# docker push <hostname>:5000/mercury:latest
+
+# Pull from registry:
+# docker pull <hostname>:5000/mercury:latest
+
 # Start container with
 # docker run -dP -p5001:5001  --mount type=bind,source=/<path-to>/settings.yaml,target=/home/rust/mercury/settings.yaml --name mercury localhost:5000/mercury:latest
+# or
+# docker-compose up -d
