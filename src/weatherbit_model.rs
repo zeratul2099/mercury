@@ -43,7 +43,7 @@ pub struct CurrentData {
     pub sunset: String,
     pub dni: f64,
     pub dewpt: f64,
-    pub snow: i64,
+    pub snow: f64,
     pub uv: f64,
     pub precip: f32,
     pub wind_dir: i64,
