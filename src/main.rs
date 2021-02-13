@@ -30,6 +30,8 @@ use tera::{Tera, GlobalFn, Value, from_value, to_value, Error as TeraError};
 use crate::common::{check_notification,establish_connection, get_settings};
 use crate::models::get_latest_values;
 use crate::weatherbit_model::{WeatherbitCurrent,WeatherbitForecast};
+use serde_json::{Map, Value as SerdeValue};
+use serde_json::Number;
 
 fn make_convert_tz(timezone: Tz) -> GlobalFn {
     Box::new(move |args| -> Result<Value, TeraError> {
@@ -152,6 +154,26 @@ async fn latest() -> HttpResponse {
     HttpResponse::Ok().json(values)
 }
 
+#[get("/api/latest_obj")]
+async fn latest_obj() -> HttpResponse {
+    let settings = get_settings();
+    let connection = establish_connection(&settings);
+    let mut sensors_obj = Map::new();
+    let mut sensor_obj;
+    let values = get_latest_values(&connection, &settings, 1, None);
+    for (id, s_name, timestamp, temp, hum, too_old) in values.into_iter() {
+        sensor_obj = Map::new();
+        sensor_obj.insert("id".to_string(), SerdeValue::String(id));
+        sensor_obj.insert("timestamp".to_string(), SerdeValue::String(timestamp));
+        sensor_obj.insert("temperature".to_string(), SerdeValue::Number(Number::from_f64(temp as f64).unwrap()));
+        sensor_obj.insert("humidity".to_string(), SerdeValue::Number(Number::from_f64(hum as f64).unwrap()));
+        sensor_obj.insert("too_old".to_string(), SerdeValue::Bool(too_old));
+        sensors_obj.insert(s_name, SerdeValue::Object(sensor_obj));
+    }
+    let obj = SerdeValue::Object(sensors_obj);
+    HttpResponse::Ok().json(obj)
+}
+
 #[get("/api/history/{days}")]
 async fn history(
         path: web::Path<(i64,)>,
@@ -240,6 +262,7 @@ async fn main() -> std::io::Result<()> {
             .service(weatherbit)
             .service(table)
             .service(latest)
+            .service(latest_obj)
             .service(history)
             .service(single_mean)
             .service(mean)
