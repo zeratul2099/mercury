@@ -163,10 +163,12 @@ async fn latest_obj() -> HttpResponse {
     let values = get_latest_values(&connection, &settings, 1, None);
     for (id, s_name, timestamp, temp, hum, too_old) in values.into_iter() {
         sensor_obj = Map::new();
+        let temp_r = ((temp as f64) * 10.0).round() / 10.0;
+        let hum_r = ((hum as f64) * 10.0).round() / 10.0;
         sensor_obj.insert("id".to_string(), SerdeValue::String(id));
         sensor_obj.insert("timestamp".to_string(), SerdeValue::String(timestamp));
-        sensor_obj.insert("temperature".to_string(), SerdeValue::Number(Number::from_f64(temp as f64).unwrap()));
-        sensor_obj.insert("humidity".to_string(), SerdeValue::Number(Number::from_f64(hum as f64).unwrap()));
+        sensor_obj.insert("temperature".to_string(), SerdeValue::Number(Number::from_f64(temp_r).unwrap()));
+        sensor_obj.insert("humidity".to_string(), SerdeValue::Number(Number::from_f64(hum_r).unwrap()));
         sensor_obj.insert("too_old".to_string(), SerdeValue::Bool(too_old));
         sensors_obj.insert(s_name, SerdeValue::Object(sensor_obj));
     }
