@@ -7,3 +7,13 @@ services:
         - "5001:5001"
         volumes:
         - ./settings.yaml:/home/rust/mercury/settings.yaml
+    db:
+        image: mariadb/server:10.5
+        restart: unless-stopped
+        environment:
+          MYSQL_USER: "${MYSQL_USER}"
+          MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+          MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+          MYSQL_DATABASE: "${MYSQL_DATABASE}"
+        volumes:
+        - ./dbdata:/var/lib/mysql

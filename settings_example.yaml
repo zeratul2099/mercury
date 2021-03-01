@@ -2,7 +2,7 @@
 device: '/dev/ttyS0'
 
 # database for logging
-database: 'sqlite:///sensor_log.db'
+database: 'mysql://<user>:<password>@db/home'
 
 # sensor name mapping
 sensor_map:
