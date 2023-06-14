@@ -8,7 +8,7 @@ services:
         volumes:
         - ./settings.yaml:/home/rust/mercury/settings.yaml
     db:
-        image: mariadb/server:10.5
+        image: mariadb:lts
         restart: unless-stopped
         environment:
           MYSQL_USER: "${MYSQL_USER}"
